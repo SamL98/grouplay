@@ -7,15 +7,37 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */; };
+		B769DB691FDC687300DDD4BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */; };
+		B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */; };
+		B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6C1FDC694700DDD4BE /* Utility.swift */; };
+		B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6E1FDC99B300DDD4BE /* Session.swift */; };
+		B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C01FD9BB3D00A00497 /* WebView.swift */; };
+		B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C21FDAF0E600A00497 /* MainViewController.swift */; };
+		B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */; };
 		B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */; };
 		B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */; };
 		B7BB98FA1FD9B0D2007BDB0B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7BB98F81FD9B0D2007BDB0B /* Main.storyboard */; };
 		B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98FB1FD9B0D2007BDB0B /* grouplay.xcdatamodeld */; };
 		B7BB98FF1FD9B0D2007BDB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B7BB98FE1FD9B0D2007BDB0B /* Assets.xcassets */; };
 		B7BB99021FD9B0D2007BDB0B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7BB99001FD9B0D2007BDB0B /* LaunchScreen.storyboard */; };
+		B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */; };
+		B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB990B1FD9B205007BDB0B /* Track.swift */; };
+		BA34BD5F70514BD163F00ABE /* Pods_grouplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72FD43446726ACEEE080A461 /* Pods_grouplay.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3613F560D06B6708C3EB2DE4 /* Pods-grouplay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-grouplay.release.xcconfig"; path = "Pods/Target Support Files/Pods-grouplay/Pods-grouplay.release.xcconfig"; sourceTree = "<group>"; };
+		72FD43446726ACEEE080A461 /* Pods_grouplay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_grouplay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E5C64E49278591CC76F39DC /* Pods-grouplay.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-grouplay.debug.xcconfig"; path = "Pods/Target Support Files/Pods-grouplay/Pods-grouplay.debug.xcconfig"; sourceTree = "<group>"; };
+		B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
+		B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
+		B769DB6C1FDC694700DDD4BE /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		B769DB6E1FDC99B300DDD4BE /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		B79FA7C01FD9BB3D00A00497 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
+		B79FA7C21FDAF0E600A00497 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackTableViewCell.swift; sourceTree = "<group>"; };
 		B7BB98F11FD9B0D2007BDB0B /* grouplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = grouplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -24,6 +46,8 @@
 		B7BB98FE1FD9B0D2007BDB0B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B7BB99011FD9B0D2007BDB0B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B7BB99031FD9B0D2007BDB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyManager.swift; sourceTree = "<group>"; };
+		B7BB990B1FD9B205007BDB0B /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,17 +55,74 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA34BD5F70514BD163F00ABE /* Pods_grouplay.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		46E7141A8594B9F57AE97EE8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				72FD43446726ACEEE080A461 /* Pods_grouplay.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5678AED64896ED9E9C9AA69E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9E5C64E49278591CC76F39DC /* Pods-grouplay.debug.xcconfig */,
+				3613F560D06B6708C3EB2DE4 /* Pods-grouplay.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		B78A8DDE2017A02D006F936E /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */,
+				B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */,
+				B79FA7C21FDAF0E600A00497 /* MainViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		B78A8DDF2017A033006F936E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */,
+				B79FA7C01FD9BB3D00A00497 /* WebView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B78A8DE02017A038006F936E /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */,
+				B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		B78A8DE12017A044006F936E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B7BB990B1FD9B205007BDB0B /* Track.swift */,
+				B769DB6E1FDC99B300DDD4BE /* Session.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		B7BB98E81FD9B0D2007BDB0B = {
 			isa = PBXGroup;
 			children = (
 				B7BB98F31FD9B0D2007BDB0B /* grouplay */,
 				B7BB98F21FD9B0D2007BDB0B /* Products */,
+				5678AED64896ED9E9C9AA69E /* Pods */,
+				46E7141A8594B9F57AE97EE8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,12 +138,17 @@
 			isa = PBXGroup;
 			children = (
 				B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */,
-				B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */,
+				B78A8DE12017A044006F936E /* Models */,
+				B78A8DE02017A038006F936E /* Managers */,
+				B78A8DDF2017A033006F936E /* Views */,
+				B78A8DDE2017A02D006F936E /* Controllers */,
 				B7BB98F81FD9B0D2007BDB0B /* Main.storyboard */,
 				B7BB98FE1FD9B0D2007BDB0B /* Assets.xcassets */,
-				B7BB99001FD9B0D2007BDB0B /* LaunchScreen.storyboard */,
+				B769DB6C1FDC694700DDD4BE /* Utility.swift */,
 				B7BB99031FD9B0D2007BDB0B /* Info.plist */,
 				B7BB98FB1FD9B0D2007BDB0B /* grouplay.xcdatamodeld */,
+				B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */,
+				B7BB99001FD9B0D2007BDB0B /* LaunchScreen.storyboard */,
 			);
 			path = grouplay;
 			sourceTree = "<group>";
@@ -74,9 +160,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B7BB99061FD9B0D2007BDB0B /* Build configuration list for PBXNativeTarget "grouplay" */;
 			buildPhases = (
+				0CABA46F17071A438B39863E /* [CP] Check Pods Manifest.lock */,
 				B7BB98ED1FD9B0D2007BDB0B /* Sources */,
 				B7BB98EE1FD9B0D2007BDB0B /* Frameworks */,
 				B7BB98EF1FD9B0D2007BDB0B /* Resources */,
+				9FC5FFA3051704966D0B4288 /* [CP] Embed Pods Frameworks */,
+				B89416600CFE6AF72EFB608B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -127,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B7BB99021FD9B0D2007BDB0B /* LaunchScreen.storyboard in Resources */,
+				B769DB691FDC687300DDD4BE /* GoogleService-Info.plist in Resources */,
 				B7BB98FF1FD9B0D2007BDB0B /* Assets.xcassets in Resources */,
 				B7BB98FA1FD9B0D2007BDB0B /* Main.storyboard in Resources */,
 			);
@@ -134,14 +224,83 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		0CABA46F17071A438B39863E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-grouplay-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9FC5FFA3051704966D0B4288 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-grouplay/Pods-grouplay-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/OAuthSwift/OAuthSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OAuthSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-grouplay/Pods-grouplay-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B89416600CFE6AF72EFB608B /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-grouplay/Pods-grouplay-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		B7BB98ED1FD9B0D2007BDB0B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */,
+				B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */,
+				B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */,
+				B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */,
 				B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */,
+				B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */,
 				B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */,
+				B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */,
+				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
+				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
+				B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +435,7 @@
 		};
 		B7BB99071FD9B0D2007BDB0B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9E5C64E49278591CC76F39DC /* Pods-grouplay.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -291,6 +451,7 @@
 		};
 		B7BB99081FD9B0D2007BDB0B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3613F560D06B6708C3EB2DE4 /* Pods-grouplay.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

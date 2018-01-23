@@ -8,6 +8,8 @@
 
 import UIKit
 import CoreData
+import OAuthSwift
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,7 +18,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        if UserDefaults.standard.string(forKey: "uid") == nil {
+            UserDefaults.standard.set(Utility.generateRandomStr(with: 20), forKey: "uid")
+        }
+        FirebaseApp.configure()
+        return true
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        if let host = url.host {
+            if host == "spotify" {
+                OAuthSwift.handle(url: url)
+            }
+        }
         return true
     }
 
