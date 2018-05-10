@@ -46,6 +46,17 @@ class Utility {
         }).resume()
     }
     
+    static func formatSeconds(time: Int) -> String {
+        let minutes = Int(time/60)
+        let seconds = time-minutes*60
+        
+        var secondStr = "\(seconds)"
+        if seconds < 10 {
+            secondStr = "0\(seconds)"
+        }
+        return "\(minutes):\(secondStr)"
+    }
+    
 }
 
 extension Date {

@@ -16,7 +16,7 @@ class SpotifyManager {
         struct Components {
             static let response_type = "code"
             static let content_type = "JSON"
-            static let scopes = "user-read-currently-playing user-library-read user-library-modify playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private"
+            static let scopes = "user-modify-playback-state user-read-currently-playing user-library-read user-library-modify playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private streaming"
             static let state = generateState(withLength: 20) as String
             static let grant_type = "refresh_token"
         }
@@ -33,19 +33,34 @@ class SpotifyManager {
         static let playlist_url = "https://api.spotify.com/v1/users/"
         static let recommendation_url = "https://api.spotify.com/v1/recommendations"
         static let current = "https://api.spotify.com/v1/me/player/currently-playing"
+        static let play = "htps://api.spotify.com/v1/me/player/play"
     }
     
     // MARK: Properties
     static let shared = SpotifyManager()
     let defaults = UserDefaults.standard
     let webView = WebView()
-    let auth = OAuth2Swift(consumerKey: Constants.Keys.client_id, consumerSecret: Constants.Keys.client_secret, authorizeUrl: URLs.authorize_url, accessTokenUrl: URLs.access_token_url, responseType: Constants.Components.response_type, contentType: Constants.Components.content_type)
+    let oauth = OAuth2Swift(consumerKey: Constants.Keys.client_id, consumerSecret: Constants.Keys.client_secret, authorizeUrl: URLs.authorize_url, accessTokenUrl: URLs.access_token_url, responseType: Constants.Components.response_type, contentType: Constants.Components.content_type)
+    
+    //var auth = SPTAuth.defaultInstance()!
+    var session: SPTSession!
+    var player: SPTAudioStreamingController!
+    
+    func initPlayer() {
+        do {
+            try player.start(withClientId: Constants.Keys.client_id)
+        } catch let error as NSError {
+            print("error starting player: \(error)")
+            return
+        }
+        player.login(withAccessToken: oauth.client.credential.oauthToken)
+    }
     
     // MARK: Authentication
     func login(onCompletion: @escaping () -> Void) {
         print("logging in to spotify")
-        //auth.authorizeURLHandler = webView
-        auth.authorize(withCallbackURL: URLs.redirect_uri, scope: Constants.Components.scopes, state: Constants.Components.state, success: { (credential, response, parameters) in
+        oauth.authorizeURLHandler = webView
+        oauth.authorize(withCallbackURL: URLs.redirect_uri, scope: Constants.Components.scopes, state: Constants.Components.state, success: { (credential, response, parameters) in
             print("login successful")
             self.fetchUserID()
             self.defaults.set(true, forKey: "loggedIn")
@@ -63,13 +78,13 @@ class SpotifyManager {
             return
         }
         
-        let _ = auth.client.post(URLs.access_token_url, parameters: [
+        let _ = oauth.client.post(URLs.access_token_url, parameters: [
             "grant_type":Constants.Components.grant_type,
             "refresh_token":refreshToken
             ], headers: ["Authorization":createRefreshTokenAuthorizationHeader()], success: { (response) in
                 print("oauth refresh successful")
                 let access_token = self.parseJSON(data: response.data)
-                self.auth.client.credential.oauthToken = access_token
+                self.oauth.client.credential.oauthToken = access_token
                 self.fetchUserID()
                 onCompletion()
         }, failure: { error in
@@ -100,15 +115,39 @@ class SpotifyManager {
         defaults.set(false, forKey: "loggedIn")
         defaults.synchronize()
         
-        auth.client.credential.oauthToken = ""
-        auth.client.credential.oauthTokenSecret = ""
-        auth.client.credential.oauthRefreshToken = ""
+        oauth.client.credential.oauthToken = ""
+        oauth.client.credential.oauthTokenSecret = ""
+        oauth.client.credential.oauthRefreshToken = ""
+    }
+    
+    // MARK: Playback
+    
+    func play(_ track: Track, completion: @escaping (Bool) -> Void) {
+        print("playing: \(track.title)")
+        print(track.trackID)
+        let reqData = Data(base64Encoded: "{\"uris\": [\"spotify:track:\(track.trackID)\"]")
+        let _ = oauth.client.put(URLs.play, parameters: [:], headers: nil, body: reqData, success: { response in
+            completion(true)
+            return
+        }, failure: { err in
+            print("error playing track: \(err)")
+            completion(false)
+            return
+        })
+    }
+    
+    func togglePause() {
+        
+    }
+    
+    func nextTrack() {
+        
     }
     
     // MARK: Data Fetching
     func fetchUserID() {
         print("fetching user id")
-        let _ = auth.client.get(URLs.user_url, success: { response in
+        let _ = oauth.client.get(URLs.user_url, success: { response in
             do {
                 let json = try response.jsonObject() as! [String:AnyObject]
                 let id = json["id"] as! String
@@ -122,7 +161,7 @@ class SpotifyManager {
     }
     
     func fetchLibrary(extraParameters: [String:AnyObject]?, onCompletion: @escaping spotify_track_response) {
-        print("fetching library")
+        //print("fetching library")
         var params = [String:AnyObject]()
         if let extraParams = extraParameters {
             for (key, value) in extraParams {
@@ -131,7 +170,7 @@ class SpotifyManager {
         }
         params["limit"] = 50 as AnyObject
         
-        let _ = auth.client.get(URLs.user_library_url, parameters: params, headers: nil, success: { response in
+        let _ = oauth.client.get(URLs.user_library_url, parameters: params, headers: nil, success: { response in
             self.parseTracks(data: response.data) { tracks, error in
                 guard error == nil else {
                     print("error while parsing library: \(error!)")
@@ -152,7 +191,7 @@ class SpotifyManager {
         params["limit"] = 50 as AnyObject
         params["offset"] = (50 * offset) as AnyObject
         
-        let _ = auth.client.get(URLs.search_url, parameters: params, headers: nil, success: { response in
+        let _ = oauth.client.get(URLs.search_url, parameters: params, headers: nil, success: { response in
             self.parseSearch(data: response.data) { (tracks, error) in
                 guard error == nil else {
                     print("error while parsing library: \(error!)")
@@ -167,7 +206,7 @@ class SpotifyManager {
     }
     
     func fetchRecommendations(track: Track, extraParameters: [String:AnyObject]?, onCompletion: @escaping spotify_track_response) {
-        print("fetching recommendations")
+        //print("fetching recommendations")
         var params = [String:AnyObject]()
         if let extraParams = extraParameters {
             for (key, value) in extraParams {
@@ -177,7 +216,7 @@ class SpotifyManager {
         params["seed_tracks"] = track.trackID as AnyObject
         params["limit"] = 50 as AnyObject
         
-        let _ = auth.client.get(URLs.recommendation_url, parameters: params, headers: nil, success: { response in
+        let _ = oauth.client.get(URLs.recommendation_url, parameters: params, headers: nil, success: { response in
             self.parseRecs(data: response.data) { Tracks, error in
                 guard error == nil else {
                     print("error while parsing recommendations: \(error!)")
@@ -192,8 +231,8 @@ class SpotifyManager {
     }
     
     func fetchCurrent(completion: @escaping curr_response) {
-        print("fetching current")
-        let _ = auth.client.get(URLs.current, success: { response in
+        //print("fetching current")
+        let _ = oauth.client.get(URLs.current, success: { response in
             var json: [String:AnyObject]?
             do {
                 json = try JSONSerialization.jsonObject(with: response.data, options: []) as? [String:AnyObject]
@@ -225,6 +264,7 @@ class SpotifyManager {
                     timeLeft -= Int((Date.now() - timestamp!/1000))
                 }
                 
+                FirebaseManager.shared.setCurrent(track, timeLeft: timeLeft/1000)
                 completion(track, timeLeft == 0 ? nil : timeLeft/1000, nil)
             } else {
                 completion(nil, nil, NSError(domain: "current-fetch", code: 421, userInfo: nil))
@@ -237,13 +277,13 @@ class SpotifyManager {
     
     // Data Posting/Deleting
     func saveTrack(track: Track, onCompletion: @escaping () -> Void) {
-        print("saving track")
+        //print("saving track")
         let url = NSURLComponents(string: URLs.user_library_url)
         url?.queryItems = [NSURLQueryItem(name: "ids", value: track.trackID) as URLQueryItem]
         var request = URLRequest(url: (url?.url)!)
         
         request.httpMethod = "PUT"
-        request.addValue("Bearer \(auth.client.credential.oauthToken)", forHTTPHeaderField: "Authorization")
+        request.addValue("Bearer \(oauth.client.credential.oauthToken)", forHTTPHeaderField: "Authorization")
         
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             guard error == nil else {
@@ -264,7 +304,7 @@ class SpotifyManager {
     
     // MARK: JSON Parsing
     func parseJSON(data: Data) -> String {
-        print("parsing JSON")
+        //print("parsing JSON")
         do {
             let jsonDictionary = try JSONSerialization.jsonObject(with: data, options: []) as! NSDictionary
             let token = jsonDictionary["access_token"] as! String
@@ -276,7 +316,7 @@ class SpotifyManager {
     }
     
     func parseRecs(data: Data, onCompletion: spotify_track_response) {
-        print("parsings recommendations")
+        //print("parsings recommendations")
         do {
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! NSDictionary
             let tracksDict = jsonObject["tracks"] as! [[String:AnyObject]]

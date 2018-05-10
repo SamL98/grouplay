@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, SPTAudioStreamingDelegate, SPTAudioStreamingPlaybackDelegate {
 
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var segControl: UISegmentedControl!
@@ -20,7 +20,20 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     @IBOutlet weak var currArtistLabel: UILabel!
     @IBOutlet weak var currTimeLabel: UILabel!
     
-    var session: Session!
+    @IBOutlet weak var playbackView: UIView!
+    @IBOutlet weak var pauseButton: UIButton!
+    @IBOutlet weak var nextButton: UIButton!
+    @IBOutlet weak var backButton: UIButton!
+    
+    var isOwner = false {
+        didSet {
+            if isOwner {
+                SpotifyManager.shared.player.delegate = self
+                SpotifyManager.shared.player.playbackDelegate = self
+                SpotifyManager.shared.initPlayer()
+            }
+        }
+    }
     
     var current: Track!
     var tracks = [Track]()
@@ -29,27 +42,194 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     private var offsetCount = 0
     private var timeLeft = 0 {
-        willSet {
+        /*willSet {
             if timeLeft <= 0 {
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 1 * 1000 * 1000 * 1000), execute: {
-                    self.fetchCurr()
-                })
+                if let session = SessionStore.session, session.approved.count > 0 {
+                    let nextUp = session.approved.last!
+                    FirebaseManager.shared.dequeue(nextUp, pending: false)
+                    SpotifyManager.shared.play(nextUp) { success in
+                        self.fetchCurr()
+                    }
+                } else {
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 1 * 1000 * 1000 * 100), execute: {
+                        self.fetchCurr()
+                    })
+                }
             }
-        }
+        }*/
+        didSet { currTimeLabel.text = Utility.formatSeconds(time: timeLeft) }
+    }
+    
+    var firstPlayOccurred = false
+    var paused = true {
         didSet {
-            currTimeLabel.text = "\(timeLeft)"
+            let title = paused ? "Play" : "Pause"
+            pauseButton.setTitle(title, for: .normal)
         }
     }
     var timer: Timer!
+    
+    var currViewDisplayed = true
+    var playbackDisplayed = false
+    
+    var swipe: UISwipeGestureRecognizer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         searchBar.delegate = self
         tableView.dataSource = self
+        tableView.delegate = self
+        
+        currView.layer.masksToBounds = false
+        currView.layer.shadowColor = UIColor.black.cgColor
+        currView.layer.shadowPath = UIBezierPath(rect: CGRect(x: 0.0, y: currView.frame.origin.y - 7.5, width: view.bounds.width, height: 7.5)).cgPath
+        currView.layer.shadowOpacity = 0.75
+        currView.layer.shadowOffset = CGSize.zero
         
         fetchLibrary()
         fetchCurr()
+        
+        swipe = UISwipeGestureRecognizer(target: self, action: #selector(MainViewController.revealPlayback))
+        swipe.direction = .up
+        currView.addGestureRecognizer(swipe)
+        
+        pauseButton.addTarget(self, action: #selector(togglePause), for: .touchUpInside)
+        nextButton.addTarget(self, action: #selector(skip), for: .touchUpInside)
+        backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
+        
+        currView.frame.origin.y = tableView.frame.maxY + 8.0
+        playbackView.frame.origin.y = view.bounds.height
+    }
+    
+    func audioStreamingDidLogin(_ audioStreaming: SPTAudioStreamingController!) {
+        print("streaming logged in")
+        UserDefaults.standard.set(true, forKey: "stream-logged-in")
+    }
+    
+    func queueApproved() {
+        for track in SessionStore.session!.approved {
+            print("queueing \(track.trackID)")
+            SpotifyManager.shared.player.queueSpotifyURI("spotify:track:" + track.trackID, callback: nil)
+        }
+    }
+    
+    func audioStreamingDidPopQueue(_ audioStreaming: SPTAudioStreamingController!) {
+        print("queue popped")
+    }
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
+        guard let nextUp = SessionStore.session!.approved.first(where: { "spotify:track:" + $0.trackID == trackUri }) else {
+            print("could not find track in session: \(trackUri!)")
+            return
+        }
+        FirebaseManager.shared.dequeue(nextUp, pending: false)
+        SessionStore.session!.approved = SessionStore.session!.approved.filter({ $0.trackID != nextUp.trackID })
+        
+        showCurrView()
+        current = nextUp
+        timeLeft = Int(current.duration/1000)
+        updateCurrDisplay()
+        
+        FirebaseManager.shared.setCurrent(current, timeLeft: timeLeft)
+    }
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
+        let nextUp = SessionStore.session!.approved[0].trackID
+        SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + nextUp, startingWith: 0, startingWithPosition: 0.0, callback: nil)
+    }
+    
+    func audioStreamingDidSkip(toNextTrack audioStreaming: SPTAudioStreamingController!) {
+        
+    }
+    
+    func audioStreamingDidSkip(toPreviousTrack audioStreaming: SPTAudioStreamingController!) {
+        
+    }
+    
+    @objc func revealPlayback() {
+        playbackDisplayed = !playbackDisplayed
+        let multiplier: CGFloat = playbackDisplayed ? 1.0 : -1.0
+        
+        guard let topConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-top" }),
+            let bottomConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-bottom" }) else {
+                print("could not find constraint")
+                return
+        }
+        topConstr.constant += self.playbackView.frame.height * multiplier
+        bottomConstr.constant += self.playbackView.frame.height * multiplier
+        UIView.animate(withDuration: 0.25, animations: {
+            //self.currView.frame.origin.y -= self.playbackView.frame.height * multiplier
+            //self.playbackView.frame.origin.y -= self.playbackView.frame.height * multiplier
+            self.view.layoutIfNeeded()
+        }, completion: {_ in
+            self.swipe.direction = self.playbackDisplayed ? .down : .up
+        })
+    }
+    
+    func hideCurrView() {
+        if !currViewDisplayed { return }
+        currViewDisplayed = false
+        
+        guard let topConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-top" }),
+            let bottomConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-bottom" }) else {
+            print("could not find constraint")
+            return
+        }
+        topConstr.constant -= self.currView.bounds.height + 8.0
+        bottomConstr.constant -= self.currView.bounds.height + 8.0
+        UIView.animate(withDuration: 0.35, animations: {
+            //self.currView.frame.origin.y += self.currView.bounds.height + 8.0
+            self.view.layoutIfNeeded()
+            //self.tableView.frame.size.height += self.currView.bounds.height + 8.0
+        })
+    }
+    
+    func showCurrView() {
+        if currViewDisplayed { return }
+        currViewDisplayed = true
+
+        guard let topConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-top" }),
+            let bottomConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-bottom" }) else {
+                print("could not find constraint")
+                return
+        }
+        topConstr.constant += self.currView.bounds.height + 8.0
+        bottomConstr.constant += self.currView.bounds.height + 8.0
+        UIView.animate(withDuration: 0.35, animations: {
+            //self.currView.frame.origin.y = self.view.bounds.height - 8.0 - self.currView.frame.size.height
+            self.view.layoutIfNeeded()
+            //self.tableView.frame.size.height -= 8.0 + self.currView.frame.size.height
+        })
+    }
+    
+    @objc func togglePause() {
+        //SpotifyManager.shared.togglePause()
+        guard current != nil else {
+            return
+        }
+        if !firstPlayOccurred && paused {
+            firstPlayOccurred = true
+            SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + current!.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
+        }
+        SpotifyManager.shared.player.setIsPlaying(paused, callback: nil)
+        paused = !paused
+    }
+    
+    @objc func skip() {
+        //SpotifyManager.shared.nextTrack()
+        //SpotifyManager.shared.player.skipNext(nil)
+        timeLeft = 0
+    }
+    
+    @objc func back() {
+        //SpotifyManager.shared.player.skipPrevious(nil)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        paused = true
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
     }
     
     func fetchLibrary() {
@@ -68,14 +248,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.offsetCount += 1
             self.fetchLibrary()
             
-            if let text = self.searchBar.text {
-                if text == "" {
-                    self.tracks = self.library
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
-                }
-            } else {
+            if self.searchBar.text == nil || self.searchBar.text! == "" {
                 self.tracks = self.library
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -85,26 +258,52 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     func fetchCurr() {
-        SpotifyManager.shared.fetchCurrent { track, time, err in
-            guard err == nil else {
-                print(err!)
-                self.currView.isHidden = true
-                return
+        guard let uid = UserDefaults.standard.string(forKey: "uid") else {
+            print("no uid")
+            return
+        }
+        guard let session = SessionStore.session else {
+            print("no session")
+            return
+        }
+        if uid == session.owner {
+            SpotifyManager.shared.fetchCurrent { track, time, err in
+                self.parseCurr(track: track, time: time, err: err)
             }
-            guard track != nil else {
-                self.currView.isHidden = true
-                return
+        } else {
+            FirebaseManager.shared.fetchCurrent { track, time, err in
+                self.parseCurr(track: track, time: time, err: err)
             }
-            self.currView.isHidden = false
-            self.current = track!
-            self.timeLeft = time == nil ? track!.duration : time!
-            self.timer = Timer(timeInterval: 1.0, repeats: true, block: { _ in
-                self.timeLeft -= 1
+        }
+    }
+    
+    func parseCurr(track: Track?, time: Int?, err: NSError?) {
+        guard err == nil else {
+            print(err!)
+            self.currViewDisplayed = true
+            self.hideCurrView()
+            return
+        }
+        guard track != nil else {
+            self.hideCurrView()
+            return
+        }
+        self.current = track!
+        self.timeLeft = time == nil ? track!.duration : time!
+        
+        DispatchQueue.main.async {
+            self.paused = false
+            self.showCurrView()
+            self.updateCurrDisplay()
+            SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + self.current.trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
+                //self.queueApproved()
             })
-            self.timer.fire()
-            DispatchQueue.main.async {
-                self.updateCurrDisplay()
-            }
+        }
+    }
+    
+    @objc func decrementTimer() {
+        if !paused {
+            timeLeft -= 1
         }
     }
     
@@ -114,8 +313,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         self.currTitleLabel.text = current.title
         self.currArtistLabel.text = current.artist
+        self.timeLeft = Int(current.duration/1000)
         
-        print(current.albumImageURL)
         Utility.loadImage(from: current.albumImageURL, completion: { img in
             DispatchQueue.main.async {
                 self.currImageView.image = img
@@ -150,6 +349,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return tracks.count
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "trackCell")!
         guard let trackCell = cell as? TrackTableViewCell else {
@@ -166,10 +369,39 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         return trackCell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if isOwner {
+            SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
+                self.paused = false
+                self.current = self.tracks[indexPath.row]
+                self.showCurrView()
+                self.updateCurrDisplay()
+                //self.queueApproved()
+            })
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let action = UITableViewRowAction(style: .normal, title: "Enqueue", handler: { _, indexPath in
+            FirebaseManager.shared.enqueue(self.tracks[indexPath.row], pending: !self.isOwner)
+            if self.isOwner {
+                //SpotifyManager.shared.player.queueSpotifyURI("spotify:track:" + self.tracks[indexPath.row].trackID, callback: nil)
+                SessionStore.session!.approved.append(self.tracks[indexPath.row])
+            }
+        })
+        return [action]
+    }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         view.viewWithTag(69)?.removeFromSuperview()
         
         guard NSString(string: searchText).length >= 2 else {
+            if searchText == "" {
+                self.tracks = self.library
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
             return
         }
         
@@ -178,7 +410,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             tableView.reloadData()
         } else {
             fetchSearches(text: searchText) {
-                _ = self.searched.map { print($0.title) }
+                //_ = self.searched.map { print($0.title) }
                 self.tracks = self.searched
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -193,6 +425,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             label.tag = 69
             label.textAlignment = .center
             view.addSubview(label)
+        } else {
+            view.viewWithTag(69)?.removeFromSuperview()
         }
     }
     

@@ -10,22 +10,61 @@ import UIKit
 import CoreData
 import OAuthSwift
 import Firebase
+import KeychainSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        UserDefaults.standard.set(false, forKey: "stream-logged-in")
         if UserDefaults.standard.string(forKey: "uid") == nil {
             UserDefaults.standard.set(Utility.generateRandomStr(with: 20), forKey: "uid")
         }
         FirebaseApp.configure()
+        
+        //SpotifyManager.shared.auth = SPTAuth.defaultInstance()
+        //SpotifyManager.shared.auth.tokenRefreshURL = URL(string: "http://localhost:5000/refresh")!
+        //SpotifyManager.shared.auth.tokenSwapURL = URL(string: "http://localhost:5000/token_swap")!
+        //SpotifyManager.shared.auth.redirectURL = URL(string: "grouplay-callback://spotify/callback")!
+        SpotifyManager.shared.player = SPTAudioStreamingController.sharedInstance()
+        //SpotifyManager.shared.auth.clientID = "3724420a06104264bc1a827d1f9e09ab"
+        //SpotifyManager.shared.auth.sessionUserDefaultsKey = "current session"
+        //SpotifyManager.shared.auth.requestedScopes = [SPTAuthStreamingScope, SPTAuthUserLibraryReadScope]
+        
         return true
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        /*if SpotifyManager.shared.auth.canHandle(SpotifyManager.shared.auth.redirectURL) {
+            SpotifyManager.shared.auth.handleAuthCallback(withTriggeredAuthURL: url, callback: { (err, sess) in
+                guard err == nil else {
+                    print("error creating authenticated spotify session: \(err!)")
+                    return
+                }
+                guard sess != nil else {
+                    print("session is nil")
+                    return
+                }
+                SpotifyManager.shared.session = sess!
+                SpotifyManager.shared.oauth.client.credential.oauthToken = sess!.accessToken
+                
+                let keychain = KeychainSwift()
+                keychain.set(sess!.canonicalUsername, forKey: "username")
+                keychain.set(sess!.accessToken, forKey: "accessToken")
+                keychain.set(sess!.encryptedRefreshToken, forKey: "refreshToken")
+                print(sess!.expirationDate)
+                
+                let formatter = DateFormatter()
+                formatter.dateFormat = ""
+                keychain.set(formatter.string(from: sess!.expirationDate), forKey: "expireDate")
+                
+                UserDefaults.standard.set(true, forKey: "spotify-logged-in")
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "login-complete"), object: nil)
+            })
+        }*/
+        
         if let host = url.host {
             if host == "spotify" {
                 OAuthSwift.handle(url: url)
@@ -33,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return true
     }
-
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -42,6 +81,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        FirebaseManager.shared.leave()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {

@@ -7,11 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B70ADDF8209F679800330A9C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B70ADDF7209F679800330A9C /* AVFoundation.framework */; };
+		B70ADDFA209F67A300330A9C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B70ADDF9209F67A300330A9C /* SystemConfiguration.framework */; };
+		B70ADDFC209F68D800330A9C /* SpotifyAuthentication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B70ADDFB209F68D800330A9C /* SpotifyAuthentication.framework */; };
+		B70ADDFE209F68E200330A9C /* SpotifyAudioPlayback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B70ADDFD209F68E200330A9C /* SpotifyAudioPlayback.framework */; };
+		B70ADE02209F69BD00330A9C /* BridgeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE01209F69BD00330A9C /* BridgeViewController.m */; };
+		B70ADE04209F846300330A9C /* SpotifyMetadata.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B70ADE03209F846300330A9C /* SpotifyMetadata.framework */; };
+		B70ADE0620A20E0600330A9C /* SessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE0520A20E0600330A9C /* SessionStore.swift */; };
 		B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */; };
 		B769DB691FDC687300DDD4BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */; };
 		B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */; };
 		B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6C1FDC694700DDD4BE /* Utility.swift */; };
 		B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6E1FDC99B300DDD4BE /* Session.swift */; };
+		B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78A8DE42017E314006F936E /* QueueViewController.swift */; };
 		B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C01FD9BB3D00A00497 /* WebView.swift */; };
 		B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C21FDAF0E600A00497 /* MainViewController.swift */; };
 		B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */; };
@@ -30,11 +38,21 @@
 		3613F560D06B6708C3EB2DE4 /* Pods-grouplay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-grouplay.release.xcconfig"; path = "Pods/Target Support Files/Pods-grouplay/Pods-grouplay.release.xcconfig"; sourceTree = "<group>"; };
 		72FD43446726ACEEE080A461 /* Pods_grouplay.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_grouplay.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9E5C64E49278591CC76F39DC /* Pods-grouplay.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-grouplay.debug.xcconfig"; path = "Pods/Target Support Files/Pods-grouplay/Pods-grouplay.debug.xcconfig"; sourceTree = "<group>"; };
+		B70ADDF7209F679800330A9C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		B70ADDF9209F67A300330A9C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		B70ADDFB209F68D800330A9C /* SpotifyAuthentication.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAuthentication.framework; sourceTree = "<group>"; };
+		B70ADDFD209F68E200330A9C /* SpotifyAudioPlayback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyAudioPlayback.framework; sourceTree = "<group>"; };
+		B70ADDFF209F69BD00330A9C /* grouplay-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "grouplay-Bridging-Header.h"; sourceTree = "<group>"; };
+		B70ADE00209F69BD00330A9C /* BridgeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgeViewController.h; sourceTree = "<group>"; };
+		B70ADE01209F69BD00330A9C /* BridgeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BridgeViewController.m; sourceTree = "<group>"; };
+		B70ADE03209F846300330A9C /* SpotifyMetadata.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SpotifyMetadata.framework; sourceTree = "<group>"; };
+		B70ADE0520A20E0600330A9C /* SessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStore.swift; sourceTree = "<group>"; };
 		B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
 		B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		B769DB6C1FDC694700DDD4BE /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		B769DB6E1FDC99B300DDD4BE /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		B78A8DE42017E314006F936E /* QueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewController.swift; sourceTree = "<group>"; };
 		B79FA7C01FD9BB3D00A00497 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		B79FA7C21FDAF0E600A00497 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackTableViewCell.swift; sourceTree = "<group>"; };
@@ -55,7 +73,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B70ADDFA209F67A300330A9C /* SystemConfiguration.framework in Frameworks */,
+				B70ADDFC209F68D800330A9C /* SpotifyAuthentication.framework in Frameworks */,
+				B70ADDF8209F679800330A9C /* AVFoundation.framework in Frameworks */,
 				BA34BD5F70514BD163F00ABE /* Pods_grouplay.framework in Frameworks */,
+				B70ADE04209F846300330A9C /* SpotifyMetadata.framework in Frameworks */,
+				B70ADDFE209F68E200330A9C /* SpotifyAudioPlayback.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +88,11 @@
 		46E7141A8594B9F57AE97EE8 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B70ADE03209F846300330A9C /* SpotifyMetadata.framework */,
+				B70ADDFD209F68E200330A9C /* SpotifyAudioPlayback.framework */,
+				B70ADDFB209F68D800330A9C /* SpotifyAuthentication.framework */,
+				B70ADDF9209F67A300330A9C /* SystemConfiguration.framework */,
+				B70ADDF7209F679800330A9C /* AVFoundation.framework */,
 				72FD43446726ACEEE080A461 /* Pods_grouplay.framework */,
 			);
 			name = Frameworks;
@@ -85,6 +113,10 @@
 				B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */,
 				B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */,
 				B79FA7C21FDAF0E600A00497 /* MainViewController.swift */,
+				B78A8DE42017E314006F936E /* QueueViewController.swift */,
+				B70ADE00209F69BD00330A9C /* BridgeViewController.h */,
+				B70ADE01209F69BD00330A9C /* BridgeViewController.m */,
+				B70ADDFF209F69BD00330A9C /* grouplay-Bridging-Header.h */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -103,6 +135,7 @@
 			children = (
 				B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */,
 				B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */,
+				B70ADE0520A20E0600330A9C /* SessionStore.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -188,6 +221,7 @@
 				TargetAttributes = {
 					B7BB98F01FD9B0D2007BDB0B = {
 						CreatedOnToolsVersion = 9.1;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -251,6 +285,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-grouplay/Pods-grouplay-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/KeychainSwift/KeychainSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/OAuthSwift/OAuthSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
@@ -258,6 +293,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OAuthSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
@@ -290,6 +326,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */,
+				B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */,
+				B70ADE02209F69BD00330A9C /* BridgeViewController.m in Sources */,
 				B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */,
 				B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */,
 				B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */,
@@ -298,6 +336,7 @@
 				B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */,
 				B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */,
 				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
+				B70ADE0620A20E0600330A9C /* SessionStore.swift in Sources */,
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
 				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
 				B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */,
@@ -438,12 +477,20 @@
 			baseConfigurationReference = 9E5C64E49278591CC76F39DC /* Pods-grouplay.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YDG22WTMXW;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = grouplay/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = LernerApps.grouplay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "grouplay/Controllers/grouplay-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -454,12 +501,19 @@
 			baseConfigurationReference = 3613F560D06B6708C3EB2DE4 /* Pods-grouplay.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YDG22WTMXW;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				INFOPLIST_FILE = grouplay/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = LernerApps.grouplay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "grouplay/Controllers/grouplay-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

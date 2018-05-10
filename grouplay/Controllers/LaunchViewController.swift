@@ -12,7 +12,8 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var tableView: UITableView!
     
-    var session: Session?
+    var isOwner = false
+    
     var recents = [String]() {
         didSet {
             tableView.reloadData()
@@ -85,12 +86,15 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 print(errStr!)
                 return
             }
-            self.session = sess
+            SessionStore.session = sess
             if !self.recents.contains(code) {
                 self.recents.append(code)
                 UserDefaults.standard.set(self.recents, forKey: "recents")
             }
             DispatchQueue.main.async {
+                if sess != nil && sess!.owner == UserDefaults.standard.string(forKey: "uid")! {
+                    self.isOwner = true
+                }
                 self.performSegue(withIdentifier: "to search", sender: nil)
             }
         })
@@ -118,25 +122,26 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
                 return
             }
-            self.session = Session(owner: uid, members: [], queue: [])
+            SessionStore.session = Session(owner: uid, members: [], approved: [], pending: [])
             self.recents.append(code!)
             UserDefaults.standard.set(self.recents, forKey: "recents")
             DispatchQueue.main.async {
+                self.isOwner = true
                 self.performSegue(withIdentifier: "to search", sender: nil)
             }
         }
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        if identifier == "to search" {
-            return session != nil
+        if identifier == "to" {
+            return SessionStore.session != nil
         }
         return true
     }
-    
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let searchVC = segue.destination as? MainViewController {
-            searchVC.session = session!
+        if let mainVC = (segue.destination as? UINavigationController)?.viewControllers[0] as? MainViewController {
+            mainVC.isOwner = self.isOwner
         }
     }
     
