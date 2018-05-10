@@ -145,4 +145,8 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
+    
 }

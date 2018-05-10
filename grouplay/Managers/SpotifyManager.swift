@@ -8,6 +8,7 @@ class SpotifyManager {
     typealias curr_response = (Track?, Int?, NSError?) -> Void
     
     // MARK: Constants
+    
     private struct Constants {
         struct Keys {
             static let client_id = "3724420a06104264bc1a827d1f9e09ab"
@@ -37,29 +38,21 @@ class SpotifyManager {
     }
     
     // MARK: Properties
+    
     static let shared = SpotifyManager()
     let defaults = UserDefaults.standard
     let webView = WebView()
     let oauth = OAuth2Swift(consumerKey: Constants.Keys.client_id, consumerSecret: Constants.Keys.client_secret, authorizeUrl: URLs.authorize_url, accessTokenUrl: URLs.access_token_url, responseType: Constants.Components.response_type, contentType: Constants.Components.content_type)
     
-    //var auth = SPTAuth.defaultInstance()!
     var session: SPTSession!
     var player: SPTAudioStreamingController!
     
-    func initPlayer() {
-        do {
-            try player.start(withClientId: Constants.Keys.client_id)
-        } catch let error as NSError {
-            print("error starting player: \(error)")
-            return
-        }
-        player.login(withAccessToken: oauth.client.credential.oauthToken)
-    }
-    
     // MARK: Authentication
+    // For information on how authentication is done, look at both OAuthSwift documentation and the Spotify API OAuth guide.
+    
     func login(onCompletion: @escaping () -> Void) {
         print("logging in to spotify")
-        oauth.authorizeURLHandler = webView
+        //oauth.authorizeURLHandler = webView
         oauth.authorize(withCallbackURL: URLs.redirect_uri, scope: Constants.Components.scopes, state: Constants.Components.state, success: { (credential, response, parameters) in
             print("login successful")
             self.fetchUserID()
@@ -68,6 +61,7 @@ class SpotifyManager {
             onCompletion()
         }, failure: { (error: Error) in
             print("error while logging into spotify: \(error)")
+            onCompletion()
         })
     }
     
@@ -120,31 +114,9 @@ class SpotifyManager {
         oauth.client.credential.oauthRefreshToken = ""
     }
     
-    // MARK: Playback
-    
-    func play(_ track: Track, completion: @escaping (Bool) -> Void) {
-        print("playing: \(track.title)")
-        print(track.trackID)
-        let reqData = Data(base64Encoded: "{\"uris\": [\"spotify:track:\(track.trackID)\"]")
-        let _ = oauth.client.put(URLs.play, parameters: [:], headers: nil, body: reqData, success: { response in
-            completion(true)
-            return
-        }, failure: { err in
-            print("error playing track: \(err)")
-            completion(false)
-            return
-        })
-    }
-    
-    func togglePause() {
-        
-    }
-    
-    func nextTrack() {
-        
-    }
-    
     // MARK: Data Fetching
+    // Check out the Spotify Web API endpoint reference to see how requests and data are formatted and such.
+    
     func fetchUserID() {
         print("fetching user id")
         let _ = oauth.client.get(URLs.user_url, success: { response in
@@ -161,7 +133,6 @@ class SpotifyManager {
     }
     
     func fetchLibrary(extraParameters: [String:AnyObject]?, onCompletion: @escaping spotify_track_response) {
-        //print("fetching library")
         var params = [String:AnyObject]()
         if let extraParams = extraParameters {
             for (key, value) in extraParams {
@@ -205,33 +176,7 @@ class SpotifyManager {
         })
     }
     
-    func fetchRecommendations(track: Track, extraParameters: [String:AnyObject]?, onCompletion: @escaping spotify_track_response) {
-        //print("fetching recommendations")
-        var params = [String:AnyObject]()
-        if let extraParams = extraParameters {
-            for (key, value) in extraParams {
-                params[key] = value
-            }
-        }
-        params["seed_tracks"] = track.trackID as AnyObject
-        params["limit"] = 50 as AnyObject
-        
-        let _ = oauth.client.get(URLs.recommendation_url, parameters: params, headers: nil, success: { response in
-            self.parseRecs(data: response.data) { Tracks, error in
-                guard error == nil else {
-                    print("error while parsing recommendations: \(error!)")
-                    onCompletion(nil, error)
-                    return
-                }
-                onCompletion(Tracks, nil)
-            }
-        }, failure: { error in
-            print("error while fetching recommendations: \(error)")
-        })
-    }
-    
     func fetchCurrent(completion: @escaping curr_response) {
-        //print("fetching current")
         let _ = oauth.client.get(URLs.current, success: { response in
             var json: [String:AnyObject]?
             do {
@@ -275,36 +220,20 @@ class SpotifyManager {
         })
     }
     
-    // Data Posting/Deleting
-    func saveTrack(track: Track, onCompletion: @escaping () -> Void) {
-        //print("saving track")
-        let url = NSURLComponents(string: URLs.user_library_url)
-        url?.queryItems = [NSURLQueryItem(name: "ids", value: track.trackID) as URLQueryItem]
-        var request = URLRequest(url: (url?.url)!)
-        
-        request.httpMethod = "PUT"
-        request.addValue("Bearer \(oauth.client.credential.oauthToken)", forHTTPHeaderField: "Authorization")
-        
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard error == nil else {
-                print("error while saving track: \(error!)")
-                return
-            }
-            
-            guard (response as! HTTPURLResponse).statusCode == 200 else {
-                print("save failed. http status code: \((response as! HTTPURLResponse).statusCode))")
-                return
-            }
-            
-            print("successfully saved track")
-            onCompletion()
+    // MARK: Playback
+    
+    func initPlayer() {
+        do {
+            try player.start(withClientId: Constants.Keys.client_id)
+        } catch let error as NSError {
+            print("error starting player: \(error)")
+            return
         }
-        task.resume()
+        player.login(withAccessToken: oauth.client.credential.oauthToken)
     }
     
     // MARK: JSON Parsing
     func parseJSON(data: Data) -> String {
-        //print("parsing JSON")
         do {
             let jsonDictionary = try JSONSerialization.jsonObject(with: data, options: []) as! NSDictionary
             let token = jsonDictionary["access_token"] as! String
@@ -312,35 +241,6 @@ class SpotifyManager {
         } catch let error as NSError {
             print("error while serializing auth JSON: \(error)")
             return ""
-        }
-    }
-    
-    func parseRecs(data: Data, onCompletion: spotify_track_response) {
-        //print("parsings recommendations")
-        do {
-            let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! NSDictionary
-            let tracksDict = jsonObject["tracks"] as! [[String:AnyObject]]
-            
-            var tracks = [Track]()
-            for trackObj in tracksDict {
-                if let title = trackObj["name"] as? String,
-                    let id = trackObj["id"] as? String,
-                    let artist = ((trackObj["artists"] as! [[String:AnyObject]])[0])["name"] as? String,
-                    let urlString = (((trackObj["album"] as! [String:AnyObject])["images"] as! [[String:AnyObject]])[0])["url"] as? String,
-                    let url = URL(string: urlString),
-                    let previewString = trackObj["preview_url"] as? String,
-                    let previewURL = URL(string: previewString),
-                    let duration = trackObj["duration"] as? Int {
-                    
-                    let track = Track(title: title, artist: artist, trackID: id, imageURL: url, image: nil, preview: previewURL, duration: duration)
-                    tracks.append(track)
-                }
-            }
-            onCompletion(tracks, nil)
-            
-        } catch let error as NSError {
-            print("error while serializing recommendation JSON")
-            onCompletion(nil, error)
         }
     }
     

@@ -14,7 +14,6 @@ class WebView: OAuthWebViewController {
         self.webView.frame = UIScreen.main.bounds
         self.webView.navigationDelegate = self
         self.view.addSubview(self.webView)
-        loadAddressURL()
     }
     
     
@@ -27,6 +26,9 @@ class WebView: OAuthWebViewController {
     }
     
     func loadAddressURL() {
+        self.webView.frame = UIScreen.main.bounds
+        self.webView.backgroundColor = UIColor.purple
+        self.view.bringSubview(toFront: self.webView)
         guard let url = targetURL else {
             print("target url is nil")
             return
@@ -43,5 +45,17 @@ extension WebView: WKNavigationDelegate {
             self.dismissWebViewController()
         }
         decisionHandler(WKNavigationActionPolicy(rawValue: 0)!)
+    }
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        print("committed")
+    }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        print("finished")
+    }
+    func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        print("received authetication challenge")
+    }
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print(error)
     }
 }

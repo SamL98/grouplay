@@ -12,6 +12,10 @@ import KeychainSwift
 class ViewController: UIViewController {
     
     var session: SPTSession!
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()

@@ -10,11 +10,13 @@ import UIKit
 
 extension MainViewController {
     
+    // Delegate method called when audio streaming has been authenticated. Just record this in UserDefaults
     func audioStreamingDidLogin(_ audioStreaming: SPTAudioStreamingController!) {
         print("streaming logged in")
         UserDefaults.standard.set(true, forKey: "stream-logged-in")
     }
     
+    // Queue all of the tracks in the approved queue of the session. Currently not being used since I cannot get the queueSpotifyURI functionality of the Spotify SDK to work :(
     func queueApproved() {
         for track in SessionStore.session!.approved {
             print("queueing \(track.trackID)")
@@ -22,10 +24,7 @@ extension MainViewController {
         }
     }
     
-    func audioStreamingDidPopQueue(_ audioStreaming: SPTAudioStreamingController!) {
-        print("queue popped")
-    }
-    
+    // Delegate method called when a track is being played. Dequeue from the database (if from that queue) and update the currView.
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
         guard let nextUp = SessionStore.session!.approved.first(where: { "spotify:track:" + $0.trackID == trackUri }) else {
             print("could not find track in session: \(trackUri!)")
@@ -39,20 +38,26 @@ extension MainViewController {
         
         showCurrView()
         current = nextUp
+        
         timeLeft = Int(current.duration/1000)
+        arcLayer.timeLimit = timeLeft
+        
+        paused = false
         updateCurrDisplay()
         
         FirebaseManager.shared.setCurrent(current, timeLeft: timeLeft)
     }
     
+    // Delegate method called when a track is done playing. Append to the list of previous songs (for backtracking) and play the next song.
+    // Would preferably use queueSpotifyURI but again, I cannot get that to work.
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
         prev.append(current)
         let nextUp = SessionStore.session!.approved[0].trackID
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + nextUp, startingWith: 0, startingWithPosition: 0.0, callback: nil)
     }
     
+    // Pause playback if currently playing. Otherwise, unpause playback.
     @objc func togglePause() {
-        //SpotifyManager.shared.togglePause()
         guard current != nil else {
             return
         }
@@ -64,16 +69,17 @@ extension MainViewController {
         paused = !paused
     }
     
+    // Set the player to the duration of the current song. Then didStopPlayingTrack will be called and the next song will be played.
     @objc func skip() {
         SpotifyManager.shared.player.seek(to: TimeInterval(current.duration/1000), callback: nil)
     }
     
+    // If the previous list is nonempty, pop the last item off and play it.
     @objc func back() {
-        guard let prevTrack = prev.last else {
+        guard let prevTrack = prev.popLast() else {
             print("no previous track")
             return
         }
-        prev.remove(at: prev.count-1)
         SessionStore.session?.approved.insert(prevTrack, at: 0)
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + prevTrack.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
     }

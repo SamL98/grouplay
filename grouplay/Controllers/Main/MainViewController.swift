@@ -43,37 +43,29 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var offsetCount = 0
     var timeLeft = 0 {
-        /*willSet {
-            if timeLeft <= 0 {
-                if let session = SessionStore.session, session.approved.count > 0 {
-                    let nextUp = session.approved.last!
-                    FirebaseManager.shared.dequeue(nextUp, pending: false)
-                    SpotifyManager.shared.play(nextUp) { success in
-                        self.fetchCurr()
-                    }
-                } else {
-                    DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 1 * 1000 * 1000 * 100), execute: {
-                        self.fetchCurr()
-                    })
-                }
-            }
-        }*/
         didSet { currTimeLabel.text = Utility.formatSeconds(time: timeLeft) }
     }
     
     var firstPlayOccurred = false
     var paused = true {
         didSet {
-            let title = paused ? "Play" : "Pause"
-            pauseButton.setTitle(title, for: .normal)
+            if isOwner {
+                let title = paused ? "Play" : "Pause"
+                pauseButton.setTitle(title, for: .normal)
+            }
         }
     }
     var timer: Timer!
+    var timerStarted = false
     
     var currViewDisplayed = true
     var playbackDisplayed = false
     
     var swipe: UISwipeGestureRecognizer!
+    var currTopConstr: NSLayoutConstraint!
+    var currBottomConstr: NSLayoutConstraint!
+    
+    var arcLayer: ArcLayer!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,15 +74,20 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         tableView.dataSource = self
         tableView.delegate = self
         
-        currView.layer.masksToBounds = false
-        currView.layer.shadowColor = UIColor.black.cgColor
-        currView.layer.shadowPath = UIBezierPath(rect: CGRect(x: 0.0, y: currView.frame.origin.y - 7.5, width: view.bounds.width, height: 7.5)).cgPath
-        currView.layer.shadowOpacity = 0.75
-        currView.layer.shadowOffset = CGSize.zero
+//        currView.layer.masksToBounds = false
+//        currView.layer.shadowColor = UIColor.black.cgColor
+//        currView.layer.shadowPath = UIBezierPath(rect: CGRect(x: 0.0, y: currView.frame.origin.y - 7.5, width: view.bounds.width, height: 7.5)).cgPath
+//        currView.layer.shadowOpacity = 0.75
+//        currView.layer.shadowOffset = CGSize.zero
+        arcLayer = ArcLayer(frame: view.viewWithTag(420)!.frame)
+        view.viewWithTag(420)?.layer.addSublayer(arcLayer)
         
-        fetchLibrary()
-        fetchCurr()
         observeQueue()
+        fetchLibrary()
+//        if !isOwner {
+//            fetchCurr()
+//        }
+        fetchCurr()
         
         swipe = UISwipeGestureRecognizer(target: self, action: #selector(MainViewController.revealPlayback))
         swipe.direction = .up
@@ -105,17 +102,25 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         currView.frame.origin.y = tableView.frame.maxY + 8.0
         playbackView.frame.origin.y = view.bounds.height
+        
+        let constraints = view.constraints.filter({ $0.identifier != nil })
+        currTopConstr = constraints.first(where: { $0.identifier! == "current-top" })
+        currBottomConstr = constraints.first(where: { $0.identifier! == "current-bottom" })
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         paused = true
-        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
+        if !timerStarted {
+            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
+            timerStarted = true
+        }
     }
     
     @objc func decrementTimer() {
         if !paused {
             timeLeft -= 1
+            arcLayer.animateArc()
         }
     }
     
@@ -125,56 +130,47 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         playbackDisplayed = !playbackDisplayed
         let multiplier: CGFloat = playbackDisplayed ? 1.0 : -1.0
         
-        guard let topConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-top" }),
-            let bottomConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-bottom" }) else {
+        guard currTopConstr != nil && currBottomConstr != nil else {
                 print("could not find constraint")
                 return
         }
-        topConstr.constant += self.playbackView.frame.height * multiplier
-        bottomConstr.constant += self.playbackView.frame.height * multiplier
+        
+        currTopConstr.constant += self.playbackView.frame.height * multiplier
+        currBottomConstr.constant += self.playbackView.frame.height * multiplier
         UIView.animate(withDuration: 0.25, animations: {
-            //self.currView.frame.origin.y -= self.playbackView.frame.height * multiplier
-            //self.playbackView.frame.origin.y -= self.playbackView.frame.height * multiplier
             self.view.layoutIfNeeded()
         }, completion: {_ in
             self.swipe.direction = self.playbackDisplayed ? .down : .up
         })
     }
     
+    func toggleCurrView(hide: Bool) {
+        let multiplier: CGFloat = hide ? -1.0 : 1.0
+        currTopConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
+        currBottomConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
+        UIView.animate(withDuration: 0.35, animations: { self.view.layoutIfNeeded() })
+    }
+    
     func hideCurrView() {
         if !currViewDisplayed { return }
         currViewDisplayed = false
         
-        guard let topConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-top" }),
-            let bottomConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-bottom" }) else {
+        guard currTopConstr != nil && currBottomConstr != nil else {
             print("could not find constraint")
             return
         }
-        topConstr.constant -= self.currView.bounds.height + 8.0
-        bottomConstr.constant -= self.currView.bounds.height + 8.0
-        UIView.animate(withDuration: 0.35, animations: {
-            //self.currView.frame.origin.y += self.currView.bounds.height + 8.0
-            self.view.layoutIfNeeded()
-            //self.tableView.frame.size.height += self.currView.bounds.height + 8.0
-        })
+        toggleCurrView(hide: true)
     }
     
     func showCurrView() {
         if currViewDisplayed { return }
         currViewDisplayed = true
 
-        guard let topConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-top" }),
-            let bottomConstr = view.constraints.filter({ $0.identifier != nil }).first(where: { $0.identifier! == "current-bottom" }) else {
+        guard currTopConstr != nil && currBottomConstr != nil else {
                 print("could not find constraint")
                 return
         }
-        topConstr.constant += self.currView.bounds.height + 8.0
-        bottomConstr.constant += self.currView.bounds.height + 8.0
-        UIView.animate(withDuration: 0.35, animations: {
-            //self.currView.frame.origin.y = self.view.bounds.height - 8.0 - self.currView.frame.size.height
-            self.view.layoutIfNeeded()
-            //self.tableView.frame.size.height -= 8.0 + self.currView.frame.size.height
-        })
+        toggleCurrView(hide: false)
     }
     
     func updateCurrDisplay() {

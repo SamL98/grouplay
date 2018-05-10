@@ -18,6 +18,7 @@
 		B70ADE0B20A4A25B00330A9C /* MainViewController+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE0A20A4A25B00330A9C /* MainViewController+TableView.swift */; };
 		B70ADE0D20A4A2B700330A9C /* MainViewController+SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */; };
 		B70ADE0F20A4A30200330A9C /* MainViewController+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE0E20A4A30200330A9C /* MainViewController+API.swift */; };
+		B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */; };
 		B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */; };
 		B769DB691FDC687300DDD4BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */; };
 		B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */; };
@@ -55,6 +56,7 @@
 		B70ADE0A20A4A25B00330A9C /* MainViewController+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+TableView.swift"; sourceTree = "<group>"; };
 		B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+SearchBar.swift"; sourceTree = "<group>"; };
 		B70ADE0E20A4A30200330A9C /* MainViewController+API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+API.swift"; sourceTree = "<group>"; };
+		B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLayer.swift; sourceTree = "<group>"; };
 		B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
 		B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 			children = (
 				B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */,
 				B79FA7C01FD9BB3D00A00497 /* WebView.swift */,
+				B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -357,6 +360,7 @@
 				B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */,
 				B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */,
 				B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */,
+				B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */,
 				B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */,
 				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
 				B70ADE0620A20E0600330A9C /* SessionStore.swift in Sources */,

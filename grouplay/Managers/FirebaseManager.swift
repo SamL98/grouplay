@@ -18,6 +18,7 @@ class FirebaseManager {
     private var sess: Session?
     private var sessRef: DatabaseReference?
     
+    // Create a session with the current user as the owner.
     func createSession(completion: @escaping (String?, String?) -> Void) {
         let code = Utility.generateRandomStr(with: 5)
         guard let uid = UserDefaults.standard.string(forKey: "uid") else {
@@ -37,6 +38,7 @@ class FirebaseManager {
         })
     }
     
+    // Attempt to join a session given a code.
     func joinSession(code: String, completion: @escaping (Session?, String?) -> Void) {
         guard let uid = UserDefaults.standard.string(forKey: "uid") else {
             return
@@ -51,11 +53,8 @@ class FirebaseManager {
                 return
             }
             
-            var members: [String] = []
-            if let memberDict = dict["members"] as? [String:AnyObject] {
-                members = memberDict.map{ $0.key }
-            }
-            members.append(uid)
+            var members = dict["members"] as? [String] ?? []
+            if !members.contains(uid) { members.append(uid) }
             
             var approved: [Track] = []
             var pending: [Track] = []
@@ -70,12 +69,13 @@ class FirebaseManager {
             }
             
             self.sessRef = Database.database().reference().child("sessions").child(code)
-            self.sessRef?.child("member").setValue(members)
+            self.sessRef?.child("members").setValue(members)
             self.sess = Session(owner: owner, members: members, approved: approved, pending: pending)
             completion(self.sess, nil)
         })
     }
     
+    // Remove the current user from the current session
     func leave() {
         guard let uid = UserDefaults.standard.string(forKey: "uid") else {
             return
@@ -84,6 +84,7 @@ class FirebaseManager {
         sessRef?.child("members").setValue(members)
     }
     
+    // Parse a dictionary into a Track object.
     func parseTrack(id: String, trackDict: [String:AnyObject]) -> Track {
         guard let title = trackDict["title"] as? String
             , let artist = trackDict["artist"] as? String
@@ -94,6 +95,7 @@ class FirebaseManager {
         return Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imageUrl)!, image: nil, preview: nil, duration: duration)
     }
     
+    // Parse a queue from the database into an array of Track objects.
     func parseQueue(dict: [String:AnyObject]) -> [Track] {
         let queue = dict.map { (subDict) -> Track in
             guard let trackDict = subDict.value as? [String:AnyObject] else {
@@ -104,6 +106,7 @@ class FirebaseManager {
         return queue.filter{ $0.title != "" }
     }
     
+    // Observe the realtime current track in the database. Only called if the session is not owned by the current user.
     func fetchCurrent(completion: @escaping (Track?, Int?, NSError?) -> Void) {
         if sessRef == nil {
             print("sess ref nil")
@@ -132,6 +135,7 @@ class FirebaseManager {
         })
     }
     
+    // Fetch the approved and pending queues from the database for the given session.
     func fetchQueue(sess: Session, completion: @escaping (String?) -> Void) {
         if sessRef == nil {
             print("sess ref nil")
@@ -153,6 +157,7 @@ class FirebaseManager {
         })
     }
     
+    // Observe additions and removals from both the approved and pending queues.
     func observeQueue(sess: Session, eventOccurred: @escaping (Bool) -> Void) {
         guard sessRef != nil else {
             print("sess ref is nil")
@@ -172,14 +177,20 @@ class FirebaseManager {
                 eventOccurred(false)
                 return
             }
+            
             let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
             var queue = path == "approved" ? sess.approved : sess.pending
             guard newTrack.trackID != "" && !queue.contains(where: { $0.trackID == newTrack.trackID }) else {
-                print("new track is nil or is already in approved queue")
+                //print("new track is nil or is already in approved queue")
                 eventOccurred(false)
                 return
             }
             queue.append(newTrack)
+            if path == "approved" {
+                SessionStore.session?.approved.append(newTrack)
+            } else {
+                SessionStore.session?.pending.append(newTrack)
+            }
             eventOccurred(true)
         })
     }
@@ -194,7 +205,7 @@ class FirebaseManager {
             let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
             var queue = path == "approved" ? sess.approved : sess.pending
             guard newTrack.trackID != "" && queue.contains(where: { $0.trackID == newTrack.trackID }) else {
-                print("new track is nil or is already in approved queue")
+                //print("new track is nil or is already in approved queue")
                 eventOccurred(false)
                 return
             }
@@ -208,6 +219,7 @@ class FirebaseManager {
         })
     }
     
+    // Set the current track in the database. Only called if the session is owned by the current user.
     func setCurrent(_ track: Track, timeLeft: Int) {
         sessRef?.child("current").setValue([
             "id": track.trackID,
@@ -220,6 +232,7 @@ class FirebaseManager {
             ])
     }
     
+    // Enqueue the given track in the database. If the current user is the owner, it is automatically set to approved. Otherwise, it is pending.
     func enqueue(_ track: Track, pending: Bool) {
         let pathExt = pending ? "pending" : "approved"
         sessRef?.child("queue").child(pathExt).child(track.trackID).setValue([
@@ -230,6 +243,7 @@ class FirebaseManager {
             ])
     }
     
+    // Remove the given track from the database queue.
     func dequeue(_ track: Track, pending: Bool) {
         let pathExt = pending ? "pending" : "approved"
         sessRef?.child("queue").child(pathExt).child(track.trackID).removeValue()
