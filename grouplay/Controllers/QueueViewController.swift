@@ -30,6 +30,12 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
         }
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(QueueViewController.refresh))
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(queueChanged), name: Notification.Name(rawValue: "queue-changed"), object: nil)
+    }
+    
+    @objc func queueChanged() {
+        tableView.reloadData()
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {

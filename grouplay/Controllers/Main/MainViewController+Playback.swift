@@ -46,16 +46,9 @@ extension MainViewController {
     }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
+        prev.append(current)
         let nextUp = SessionStore.session!.approved[0].trackID
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + nextUp, startingWith: 0, startingWithPosition: 0.0, callback: nil)
-    }
-    
-    func audioStreamingDidSkip(toNextTrack audioStreaming: SPTAudioStreamingController!) {
-        
-    }
-    
-    func audioStreamingDidSkip(toPreviousTrack audioStreaming: SPTAudioStreamingController!) {
-        
     }
     
     @objc func togglePause() {
@@ -72,13 +65,17 @@ extension MainViewController {
     }
     
     @objc func skip() {
-        //SpotifyManager.shared.nextTrack()
-        //SpotifyManager.shared.player.skipNext(nil)
         SpotifyManager.shared.player.seek(to: TimeInterval(current.duration/1000), callback: nil)
     }
     
     @objc func back() {
-        //SpotifyManager.shared.player.skipPrevious(nil)
+        guard let prevTrack = prev.last else {
+            print("no previous track")
+            return
+        }
+        prev.remove(at: prev.count-1)
+        SessionStore.session?.approved.insert(prevTrack, at: 0)
+        SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + prevTrack.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
     }
     
 }

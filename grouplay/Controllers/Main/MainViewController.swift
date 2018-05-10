@@ -37,6 +37,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var current: Track!
     var tracks = [Track]()
+    var prev = [Track]()
     var library = [Track]()
     var searched = [Track]()
     
@@ -89,14 +90,18 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         fetchLibrary()
         fetchCurr()
+        observeQueue()
         
         swipe = UISwipeGestureRecognizer(target: self, action: #selector(MainViewController.revealPlayback))
         swipe.direction = .up
-        currView.addGestureRecognizer(swipe)
-        
-        pauseButton.addTarget(self, action: #selector(togglePause), for: .touchUpInside)
-        nextButton.addTarget(self, action: #selector(skip), for: .touchUpInside)
-        backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
+        if isOwner {
+            currView.addGestureRecognizer(swipe)
+            pauseButton.addTarget(self, action: #selector(togglePause), for: .touchUpInside)
+            nextButton.addTarget(self, action: #selector(skip), for: .touchUpInside)
+            backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
+        } else {
+            playbackView.removeFromSuperview()
+        }
         
         currView.frame.origin.y = tableView.frame.maxY + 8.0
         playbackView.frame.origin.y = view.bounds.height
@@ -107,6 +112,14 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         paused = true
         timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
     }
+    
+    @objc func decrementTimer() {
+        if !paused {
+            timeLeft -= 1
+        }
+    }
+    
+    // MARK: Toolbar UI Methods
     
     @objc func revealPlayback() {
         playbackDisplayed = !playbackDisplayed
@@ -162,12 +175,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             self.view.layoutIfNeeded()
             //self.tableView.frame.size.height -= 8.0 + self.currView.frame.size.height
         })
-    }
-    
-    @objc func decrementTimer() {
-        if !paused {
-            timeLeft -= 1
-        }
     }
     
     func updateCurrDisplay() {

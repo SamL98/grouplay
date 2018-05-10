@@ -84,17 +84,22 @@ class FirebaseManager {
         sessRef?.child("members").setValue(members)
     }
     
+    func parseTrack(id: String, trackDict: [String:AnyObject]) -> Track {
+        guard let title = trackDict["title"] as? String
+            , let artist = trackDict["artist"] as? String
+            , let imageUrl = trackDict["imageURL"] as? String
+            , let duration = trackDict["duration"] as? Int else {
+                return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "https://fake.com")!, image: nil, preview: nil, duration: 0)
+        }
+        return Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imageUrl)!, image: nil, preview: nil, duration: duration)
+    }
+    
     func parseQueue(dict: [String:AnyObject]) -> [Track] {
         let queue = dict.map { (subDict) -> Track in
-            guard let trackDict = subDict.value as? [String:String] else {
+            guard let trackDict = subDict.value as? [String:AnyObject] else {
                 return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "")!, image: nil, preview: nil, duration: 0)
             }
-            guard let title = trackDict["title"]
-                , let artist = trackDict["artist"]
-                , let imageUrl = trackDict["imageURL"] else {
-                    return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "")!, image: nil, preview: nil, duration: 0)
-            }
-            return Track(title: title, artist: artist, trackID: subDict.key, imageURL: URL(string: imageUrl)!, image: nil, preview: nil, duration: 0)
+            return parseTrack(id: subDict.key, trackDict: trackDict)
         }
         return queue.filter{ $0.title != "" }
     }
@@ -148,6 +153,61 @@ class FirebaseManager {
         })
     }
     
+    func observeQueue(sess: Session, eventOccurred: @escaping (Bool) -> Void) {
+        guard sessRef != nil else {
+            print("sess ref is nil")
+            eventOccurred(false)
+            return
+        }
+        observeQueuePathAdd(sess: sess, path: "approved", eventOccurred)
+        observeQueuePathAdd(sess: sess, path: "pending", eventOccurred)
+        observeQueuePathRemove(sess: sess, path: "approved", eventOccurred)
+        observeQueuePathRemove(sess: sess, path: "pending", eventOccurred)
+    }
+    
+    private func observeQueuePathAdd(sess: Session, path: String, _ eventOccurred: @escaping (Bool) -> Void) {
+        sessRef!.child("queue").child(path).observe(.childAdded, with: { snap in
+            guard let newTrackDict = snap.value as? [String:AnyObject] else {
+                print("could not parse new track from snapshot: \(String(describing: snap.value))")
+                eventOccurred(false)
+                return
+            }
+            let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
+            var queue = path == "approved" ? sess.approved : sess.pending
+            guard newTrack.trackID != "" && !queue.contains(where: { $0.trackID == newTrack.trackID }) else {
+                print("new track is nil or is already in approved queue")
+                eventOccurred(false)
+                return
+            }
+            queue.append(newTrack)
+            eventOccurred(true)
+        })
+    }
+    
+    private func observeQueuePathRemove(sess: Session, path: String, _ eventOccurred: @escaping (Bool) -> Void) {
+        sessRef!.child("queue").child(path).observe(.childRemoved, with: { snap in
+            guard let newTrackDict = snap.value as? [String:AnyObject] else {
+                print("could not parse new track from snapshot: \(String(describing: snap.value))")
+                eventOccurred(false)
+                return
+            }
+            let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
+            var queue = path == "approved" ? sess.approved : sess.pending
+            guard newTrack.trackID != "" && queue.contains(where: { $0.trackID == newTrack.trackID }) else {
+                print("new track is nil or is already in approved queue")
+                eventOccurred(false)
+                return
+            }
+            var i = 0
+            for track in queue {
+                if track.trackID == newTrack.trackID { break }
+                i += 1
+            }
+            queue.remove(at: i)
+            eventOccurred(true)
+        })
+    }
+    
     func setCurrent(_ track: Track, timeLeft: Int) {
         sessRef?.child("current").setValue([
             "id": track.trackID,
@@ -165,7 +225,8 @@ class FirebaseManager {
         sessRef?.child("queue").child(pathExt).child(track.trackID).setValue([
             "title": track.title,
             "artist": track.artist,
-            "imageURL": "\(track.albumImageURL)"
+            "imageURL": "\(track.albumImageURL)",
+            "duration": track.duration
             ])
     }
     

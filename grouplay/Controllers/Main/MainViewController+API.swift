@@ -10,6 +10,13 @@ import UIKit
 
 extension MainViewController {
     
+    func observeQueue() {
+        guard let sess = SessionStore.session else { return }
+        FirebaseManager.shared.observeQueue(sess: sess, eventOccurred: { needsUpdate in
+            if needsUpdate { NotificationCenter.default.post(name: Notification.Name(rawValue: "queue-changed"), object: nil) }
+        })
+    }
+    
     func fetchLibrary() {
         guard offsetCount <= 10 else {
             return
@@ -36,15 +43,7 @@ extension MainViewController {
     }
     
     func fetchCurr() {
-        guard let uid = UserDefaults.standard.string(forKey: "uid") else {
-            print("no uid")
-            return
-        }
-        guard let session = SessionStore.session else {
-            print("no session")
-            return
-        }
-        if uid == session.owner {
+        if isOwner {
             SpotifyManager.shared.fetchCurrent { track, time, err in
                 self.parseCurr(track: track, time: time, err: err)
             }
@@ -73,9 +72,9 @@ extension MainViewController {
             self.paused = false
             self.showCurrView()
             self.updateCurrDisplay()
-            SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + self.current.trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
-                //self.queueApproved()
-            })
+            if self.isOwner {
+                SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + self.current.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
+            }
         }
     }
     
