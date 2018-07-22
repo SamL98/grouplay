@@ -35,6 +35,7 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     @objc func queueChanged() {
+        print("queue change")
         tableView.reloadData()
     }
     

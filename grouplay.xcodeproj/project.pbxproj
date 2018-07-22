@@ -25,6 +25,8 @@
 		B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6C1FDC694700DDD4BE /* Utility.swift */; };
 		B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6E1FDC99B300DDD4BE /* Session.swift */; };
 		B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78A8DE42017E314006F936E /* QueueViewController.swift */; };
+		B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */; };
+		B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */; };
 		B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C01FD9BB3D00A00497 /* WebView.swift */; };
 		B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C21FDAF0E600A00497 /* MainViewController.swift */; };
 		B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */; };
@@ -63,6 +65,8 @@
 		B769DB6C1FDC694700DDD4BE /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		B769DB6E1FDC99B300DDD4BE /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		B78A8DE42017E314006F936E /* QueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewController.swift; sourceTree = "<group>"; };
+		B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowQRViewController.swift; sourceTree = "<group>"; };
+		B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRViewController.swift; sourceTree = "<group>"; };
 		B79FA7C01FD9BB3D00A00497 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		B79FA7C21FDAF0E600A00497 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackTableViewCell.swift; sourceTree = "<group>"; };
@@ -139,6 +143,8 @@
 				B70ADE00209F69BD00330A9C /* BridgeViewController.h */,
 				B70ADE01209F69BD00330A9C /* BridgeViewController.m */,
 				B70ADDFF209F69BD00330A9C /* grouplay-Bridging-Header.h */,
+				B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */,
+				B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -310,6 +316,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/KeychainSwift/KeychainSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/OAuthSwift/OAuthSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/QRCode/QRCode.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
@@ -318,6 +325,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KeychainSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OAuthSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/QRCode.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
@@ -353,6 +361,7 @@
 				B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */,
 				B70ADE02209F69BD00330A9C /* BridgeViewController.m in Sources */,
 				B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */,
+				B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */,
 				B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */,
 				B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */,
 				B70ADE0920A4A16900330A9C /* MainViewController+Playback.swift in Sources */,
@@ -367,6 +376,7 @@
 				B70ADE0B20A4A25B00330A9C /* MainViewController+TableView.swift in Sources */,
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
 				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
+				B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */,
 				B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

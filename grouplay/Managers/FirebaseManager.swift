@@ -90,16 +90,16 @@ class FirebaseManager {
             , let artist = trackDict["artist"] as? String
             , let imageUrl = trackDict["imageURL"] as? String
             , let duration = trackDict["duration"] as? Int else {
-                return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "https://fake.com")!, image: nil, preview: nil, duration: 0)
+                return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "https://fake.com")!, image: nil, preview: nil, duration: 0, timestamp: 0)
         }
-        return Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imageUrl)!, image: nil, preview: nil, duration: duration)
+        return Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imageUrl)!, image: nil, preview: nil, duration: duration, timestamp: trackDict["timestamp"] as? UInt64 ?? Date.now())
     }
     
     // Parse a queue from the database into an array of Track objects.
     func parseQueue(dict: [String:AnyObject]) -> [Track] {
         let queue = dict.map { (subDict) -> Track in
             guard let trackDict = subDict.value as? [String:AnyObject] else {
-                return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "")!, image: nil, preview: nil, duration: 0)
+                return Track(title: "", artist: "", trackID: "", imageURL: URL(string: "")!, image: nil, preview: nil, duration: 0, timestamp: 0)
             }
             return parseTrack(id: subDict.key, trackDict: trackDict)
         }
@@ -107,31 +107,37 @@ class FirebaseManager {
     }
     
     // Observe the realtime current track in the database. Only called if the session is not owned by the current user.
-    func fetchCurrent(completion: @escaping (Track?, Int?, NSError?) -> Void) {
+    func fetchCurrent(completion: @escaping (Track?, Int?, Bool?, NSError?) -> Void) {
         if sessRef == nil {
             print("sess ref nil")
-            completion(nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+            completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
             return
         }
         sessRef?.child("current").observe(.value, with: { snap in
+            if let pausedVal = snap.value as? Bool {
+                NotificationCenter.default.post(name: Notification.Name(rawValue: "paused-changed"), object: nil, userInfo: ["paused": pausedVal])
+                return
+            }
+
             guard let val = snap.value as? [String:AnyObject] else {
-                completion(nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+                completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
                 return
             }
             guard let id = val["id"] as? String, let title = val["title"] as? String,
                 let artist = val["artist"] as? String, let imgUrl = val["imageURL"] as? String,
-                var timeLeft = val["time_left"] as? Int, let duration = val["duration"] as? Int,
-                let timestamp = val["timestamp"] as? UInt64 else {
-                    print("irrelevant info in current dict")
-                    completion(nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+                let timeLeft = val["time_left"] as? Int, let duration = val["duration"] as? Int,
+                let timestamp = val["timestamp"] as? UInt64,
+                let paused = val["paused"] as? Bool else {
+                    //print("irrelevant info in current dict")
+                    completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
                     return
             }
-            let track = Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imgUrl)!, image: nil, preview: nil, duration: duration)
-            timeLeft -= Int((Date.now() - timestamp/1000)/1000)
-            completion(track, timeLeft, nil)
+            let track = Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imgUrl)!, image: nil, preview: nil, duration: duration, timestamp: timestamp)
+            //timeLeft -= Int((Date.now() - timestamp)/1000)
+            completion(track, timeLeft, paused,  nil)
         }, withCancel: { err in
-            print(err)
-            completion(nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+            print("could not fetch current (firebase): \(err)")
+            completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
         })
     }
     
@@ -155,6 +161,14 @@ class FirebaseManager {
             }
             completion(nil)
         })
+    }
+    
+    func updatePause(_ paused: Bool) {
+        sessRef?.child("current").child("paused").setValue(paused)
+    }
+    
+    func setTimeLeft(_ timeLeft: Int) {
+        sessRef?.child("current").child("time_left").setValue(timeLeft)
     }
     
     // Observe additions and removals from both the approved and pending queues.
@@ -220,7 +234,7 @@ class FirebaseManager {
     }
     
     // Set the current track in the database. Only called if the session is owned by the current user.
-    func setCurrent(_ track: Track, timeLeft: Int) {
+    func setCurrent(_ track: Track, timeLeft: Int, paused: Bool) {
         sessRef?.child("current").setValue([
             "id": track.trackID,
             "title": track.title,
@@ -228,25 +242,32 @@ class FirebaseManager {
             "imageURL": "\(track.albumImageURL)",
             "time_left": timeLeft,
             "duration": track.duration,
-            "timestamp": Date.now()
+            "timestamp": Date.now(),
+            "paused": paused
             ])
     }
     
     // Enqueue the given track in the database. If the current user is the owner, it is automatically set to approved. Otherwise, it is pending.
     func enqueue(_ track: Track, pending: Bool) {
-        let pathExt = pending ? "pending" : "approved"
-        sessRef?.child("queue").child(pathExt).child(track.trackID).setValue([
-            "title": track.title,
-            "artist": track.artist,
-            "imageURL": "\(track.albumImageURL)",
-            "duration": track.duration
-            ])
+        insert(track, pending: pending, before: Date.now())
     }
     
     // Remove the given track from the database queue.
     func dequeue(_ track: Track, pending: Bool) {
         let pathExt = pending ? "pending" : "approved"
         sessRef?.child("queue").child(pathExt).child(track.trackID).removeValue()
+    }
+    
+    // Insert into the queue before the given position for when the previous track is skipped
+    func insert(_ track: Track, pending: Bool, before: UInt64) {
+        let pathExt = pending ? "pending" : "approved"
+        sessRef?.child("queue").child(pathExt).child(track.trackID).setValue([
+            "title": track.title,
+            "artist": track.artist,
+            "imageURL": "\(track.albumImageURL)",
+            "duration": track.duration,
+            "timestamp": before-1
+            ])
     }
     
 }

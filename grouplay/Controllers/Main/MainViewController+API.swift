@@ -17,18 +17,26 @@ extension MainViewController {
         })
     }
     
+    @objc func pausedChanged(info: [String:AnyObject]) {
+        guard SessionStore.session != nil else { return }
+        guard let pausedVal = info["paused"] as? Bool else { return }
+        if pausedVal != paused { togglePause() }
+    }
+    
     func fetchLibrary() {
         guard offsetCount <= 10 else {
             return
         }
         SpotifyManager.shared.fetchLibrary(extraParameters: ["offset": (50 * offsetCount) as AnyObject], onCompletion: { (optTracksArr, error) in
             guard error == nil else {
-                print("\(error!)")
+                print("fetch library \(error!)")
                 return
             }
             guard let tracksArr = optTracksArr else {
+                print("tracks arr is nil")
                 return
             }
+
             self.library.append(contentsOf: tracksArr)
             self.offsetCount += 1
             self.fetchLibrary()
@@ -43,38 +51,29 @@ extension MainViewController {
     }
     
     func fetchCurr() {
-        if isOwner {
-            SpotifyManager.shared.fetchCurrent { track, time, err in
-                self.parseCurr(track: track, time: time, err: err)
-            }
-        } else {
-            FirebaseManager.shared.fetchCurrent { track, time, err in
-                self.parseCurr(track: track, time: time, err: err)
-            }
+        FirebaseManager.shared.fetchCurrent { track, time, paused, err in
+            self.parseCurr(track: track, time: time, paused: paused, err: err)
         }
     }
     
-    func parseCurr(track: Track?, time: Int?, err: NSError?) {
+    func parseCurr(track: Track?, time: Int?, paused: Bool?, err: NSError?) {
         guard err == nil else {
-            print(err!)
+            print("parsing curr: \(err!)")
             self.currViewDisplayed = true
             self.hideCurrView()
             return
         }
-        guard track != nil else {
+        guard track != nil && paused != nil else {
             self.hideCurrView()
             return
         }
         self.current = track!
-        self.timeLeft = time == nil ? track!.duration : time!
+        self.paused = paused!
         
         DispatchQueue.main.async {
-            self.paused = false
             self.showCurrView()
             self.updateCurrDisplay()
-            if self.isOwner {
-                SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + self.current.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
-            }
+            self.timeLeft = time == nil ? track!.duration : time!
         }
     }
     

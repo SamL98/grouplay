@@ -12,10 +12,7 @@ import UIKit
 extension MainViewController {
     
     func fetchSearches(text: String, completion: @escaping () -> Void) {
-        guard let query = text.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) else {
-            completion()
-            return
-        }
+        let query = text.lowercased().replacingOccurrences(of: " ", with: "+")
         SpotifyManager.shared.searchTracks(query: query, offset: 0) { (optTracksArr, error) in
             guard error == nil else {
                 print("\(error!)")
@@ -25,6 +22,7 @@ extension MainViewController {
                 print("tracks are nil from search")
                 return
             }
+
             self.searched = tracksArr
             completion()
         }
@@ -35,8 +33,10 @@ extension MainViewController {
         
         guard NSString(string: searchText).length >= 2 else {
             if searchText == "" {
+                self.searchBar.resignFirstResponder()
                 self.tracks = self.library
                 DispatchQueue.main.async {
+                    self.segControl.selectedSegmentIndex = 0
                     self.tableView.reloadData()
                 }
             }
@@ -68,8 +68,31 @@ extension MainViewController {
         }
     }
     
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        print("canceled")
+        self.searchBar.resignFirstResponder()
+        self.tracks = self.library
+        DispatchQueue.main.async {
+            self.segControl.selectedSegmentIndex = 0
+            self.tableView.reloadData()
+        }
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        print("end editing")
+        self.searchBar.resignFirstResponder()
+        self.searchBar.endEditing(true)
+        self.tracks = self.library
+        DispatchQueue.main.async {
+            self.segControl.selectedSegmentIndex = 0
+            self.tableView.reloadData()
+        }
+    }
+    
     func filterTracks(text: String, tracksToFilter: [Track]) {
-        tracks = tracksToFilter.filter{ $0.title.lowercased().contains(text.lowercased()) }
+        tracks = tracksToFilter.filter{
+            $0.title.lowercased().contains(text.lowercased()) || $0.artist.lowercased().contains(text.lowercased())
+        }
     }
     
 }

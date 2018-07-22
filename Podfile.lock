@@ -28,12 +28,14 @@ PODS:
   - nanopb/decode (0.3.8)
   - nanopb/encode (0.3.8)
   - OAuthSwift (1.2.0)
+  - QRCode (2.0)
 
 DEPENDENCIES:
   - Firebase/Core
   - Firebase/Database
   - KeychainSwift
   - OAuthSwift
+  - QRCode
 
 SPEC CHECKSUMS:
   Firebase: dbfb98ccec2dcfcd21ab9cc1b4981a3f3c8c5e26
@@ -46,7 +48,8 @@ SPEC CHECKSUMS:
   leveldb-library: 08cba283675b7ed2d99629a4bc5fd052cd2bb6a5
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   OAuthSwift: 7fd6855b8e4d58eb5a30d156ea9bed7a8aecd1ca
+  QRCode: f98a1886c8f37523704a7512a4c0cd45b34c18a4
 
-PODFILE CHECKSUM: 0ccb49b95390917e153ef7619302c83687cc6fb8
+PODFILE CHECKSUM: c980ea90e38c570e0e1832fab0592fee7b9b0400
 
 COCOAPODS: 1.3.1

@@ -52,6 +52,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             if isOwner {
                 let title = paused ? "Play" : "Pause"
                 pauseButton.setTitle(title, for: .normal)
+                FirebaseManager.shared.updatePause(paused)
             }
         }
     }
@@ -73,21 +74,28 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         searchBar.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
-        
-//        currView.layer.masksToBounds = false
-//        currView.layer.shadowColor = UIColor.black.cgColor
-//        currView.layer.shadowPath = UIBezierPath(rect: CGRect(x: 0.0, y: currView.frame.origin.y - 7.5, width: view.bounds.width, height: 7.5)).cgPath
-//        currView.layer.shadowOpacity = 0.75
-//        currView.layer.shadowOffset = CGSize.zero
-        arcLayer = ArcLayer(frame: view.viewWithTag(420)!.frame)
-        view.viewWithTag(420)?.layer.addSublayer(arcLayer)
+
+        arcLayer = ArcLayer(frame: view.viewWithTag(421)!.frame)
+        view.viewWithTag(421)?.layer.addSublayer(arcLayer)
+        view.viewWithTag(421)?.clipsToBounds = false
         
         observeQueue()
         fetchLibrary()
-//        if !isOwner {
-//            fetchCurr()
-//        }
         fetchCurr()
+        
+        paused = true
+        
+        currView.layer.masksToBounds = false
+        currView.layer.shadowColor = UIColor.black.cgColor
+        currView.layer.shadowOpacity = 0.65
+        currView.layer.shadowRadius = 3.0
+        currView.layer.shadowOffset = CGSize(width: 0.0, height: -10.0)
+        
+        playbackView.layer.masksToBounds = false
+        playbackView.layer.shadowColor = UIColor.black.cgColor
+        playbackView.layer.shadowOpacity = 0.65
+        playbackView.layer.shadowRadius = 3.0
+        playbackView.layer.shadowOffset = CGSize(width: 0.0, height: -10.0)
         
         swipe = UISwipeGestureRecognizer(target: self, action: #selector(MainViewController.revealPlayback))
         swipe.direction = .up
@@ -106,11 +114,15 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         let constraints = view.constraints.filter({ $0.identifier != nil })
         currTopConstr = constraints.first(where: { $0.identifier! == "current-top" })
         currBottomConstr = constraints.first(where: { $0.identifier! == "current-bottom" })
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTime), name: Notification.Name(rawValue: "update-time"), object: nil)
+        if !isOwner {
+            NotificationCenter.default.addObserver(self, selector: #selector(pausedChanged), name: Notification.Name(rawValue: "paused-changed"), object: nil)
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        paused = true
         if !timerStarted {
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
             timerStarted = true
@@ -120,8 +132,13 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     @objc func decrementTimer() {
         if !paused {
             timeLeft -= 1
+            if isOwner { updateTime() }
             arcLayer.animateArc()
         }
+    }
+    
+    @objc func updateTime() {
+        FirebaseManager.shared.setTimeLeft(timeLeft)
     }
     
     // MARK: Toolbar UI Methods
@@ -135,7 +152,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
                 return
         }
         
-        currTopConstr.constant += self.playbackView.frame.height * multiplier
+        currTopConstr.constant -= self.playbackView.frame.height * multiplier
         currBottomConstr.constant += self.playbackView.frame.height * multiplier
         UIView.animate(withDuration: 0.25, animations: {
             self.view.layoutIfNeeded()
@@ -179,7 +196,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         self.currTitleLabel.text = current.title
         self.currArtistLabel.text = current.artist
-        self.timeLeft = Int(current.duration/1000)
+        //self.timeLeft = Int(current.duration/1000)
         
         Utility.loadImage(from: current.albumImageURL, completion: { img in
             DispatchQueue.main.async {
@@ -187,5 +204,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }
         })
     }
-
+    
+    @IBAction func goBack(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
 }

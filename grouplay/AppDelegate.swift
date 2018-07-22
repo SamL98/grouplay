@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         UserDefaults.standard.set(false, forKey: "stream-logged-in")
+        //UserDefaults.standard.set(false, forKey: "loggedIn")
         if UserDefaults.standard.string(forKey: "uid") == nil {
             UserDefaults.standard.set(Utility.generateRandomStr(with: 20), forKey: "uid")
         }
@@ -29,10 +30,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        if let host = url.host {
-            if host == "spotify" {
-                OAuthSwift.handle(url: url)
+        if !UserDefaults.standard.bool(forKey: "appAuthUsed") {
+            if let host = url.host {
+                if host == "spotify" {
+                    OAuthSwift.handle(url: url)
+                }
             }
+        } else if let scheme = url.scheme, scheme == "grouplay-callback" {
+            var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)!
+            var qs = comps.queryItems!
+            var i = 0
+            var optCode: String? = nil
+            while i < qs.count {
+                if qs[i].name == "code" {
+                    optCode = qs[i].value
+                    break
+                }
+                i += 1
+            }
+            guard let code = optCode else {
+                print("code not found: \(url)")
+                return false
+            }
+            NotificationCenter.default.post(
+                name: NSNotification.Name("authURLOpened"),
+                object: nil,
+                userInfo: ["code": code])
         }
         return true
     }
@@ -40,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "update-time"), object: nil, userInfo: nil)
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {

@@ -10,5 +10,6 @@ target 'grouplay' do
   pod 'Firebase/Core'
   pod 'Firebase/Database'
   pod 'KeychainSwift'
+  pod 'QRCode'
   
 end

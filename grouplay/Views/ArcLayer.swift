@@ -27,7 +27,7 @@ class ArcLayer: CAShapeLayer {
         fillColor = UIColor.clear.cgColor
         strokeColor = UIColor(red: 124.0/255.0, green: 222.0/255.0, blue: 117.0/255.0, alpha: 1.0).cgColor
         //strokeColor = UIColor.blue.cgColor
-        lineWidth = 5.0
+        lineWidth = 4.0
         lineCap = kCALineCapRound
         lineJoin = kCALineJoinRound
     }
@@ -46,7 +46,7 @@ class ArcLayer: CAShapeLayer {
     }
     
     private func createPath(_ time: Int) -> UIBezierPath {
-        if time < 0 { return UIBezierPath(cgPath: self.path!) }
+        if time < 0 { return UIBezierPath() }
         let center = CGPoint(x: self.parentFrame.width/2, y: self.parentFrame.height/2)
         
         let increment = 3.14/(Double(timeLimit)/2.0)
@@ -54,12 +54,13 @@ class ArcLayer: CAShapeLayer {
         let endAngle = CGFloat(-1.57 + offset)
         
         let arcPath = UIBezierPath()
-        arcPath.addArc(withCenter: center, radius: self.parentFrame.width/2 - 5.0, startAngle: -CGFloat(1.57), endAngle: endAngle, clockwise: true)
+        arcPath.addArc(withCenter: center, radius: self.parentFrame.width/2 - 7.5, startAngle: -CGFloat(1.57), endAngle: endAngle, clockwise: true)
         return arcPath
     }
     
     func animateArc() {
         counter -= 1
+        guard counter > 0 else { return }
         let nextPath = createPath(counter).cgPath
         
         path = nextPath

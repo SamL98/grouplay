@@ -13,6 +13,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var tableView: UITableView!
     
     var isOwner = false
+    var code: String?
     
     var recents = [String]() {
         didSet {
@@ -23,6 +24,10 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     override func viewDidLoad() {
         super.viewDidLoad()
         recents = UserDefaults.standard.array(forKey: "recents") as? [String] ?? []
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if code != nil { join(code: code!) }
     }
     
     func displayError(title: String, message: String) {
@@ -44,11 +49,15 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         alert.addTextField(configurationHandler: nil)
         alert.addAction(UIAlertAction(title: "Go", style: .default, handler: { _ in
             guard let textfield = alert.textFields?.first else {
-                completion("")
+                alert.dismiss(animated: true, completion: nil)
                 return
             }
             guard let text = textfield.text else {
-                completion("")
+                alert.dismiss(animated: true, completion: nil)
+                return
+            }
+            guard text.characters.count > 0 else {
+                alert.dismiss(animated: true, completion: nil)
                 return
             }
             completion(text)
@@ -72,6 +81,11 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         join(code: recents[indexPath.row])
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    @IBAction func scanQR(_ sender: UIButton) {
+        performSegue(withIdentifier: "to scan QR", sender: nil)
     }
 
     @IBAction func joinSession(_ sender: UIButton) {
@@ -86,11 +100,15 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 print(errStr!)
                 return
             }
+
+            UserDefaults.standard.set(code, forKey: "currCode")
             SessionStore.session = sess
+            
             if !self.recents.contains(code) {
                 self.recents.append(code)
                 UserDefaults.standard.set(self.recents, forKey: "recents")
             }
+            
             DispatchQueue.main.async {
                 if sess != nil && sess!.owner == UserDefaults.standard.string(forKey: "uid")! {
                     self.isOwner = true
@@ -122,9 +140,13 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 }
                 return
             }
+            
             SessionStore.session = Session(owner: uid, members: [], approved: [], pending: [])
             self.recents.append(code!)
+            
             UserDefaults.standard.set(self.recents, forKey: "recents")
+            UserDefaults.standard.set(code!, forKey: "currCode")
+            
             DispatchQueue.main.async {
                 self.isOwner = true
                 self.performSegue(withIdentifier: "to search", sender: nil)
@@ -133,6 +155,8 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        print("perform segue")
+        print(identifier)
         if identifier == "to" {
             return SessionStore.session != nil
         }
@@ -145,8 +169,8 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
 }
