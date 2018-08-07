@@ -10,4 +10,5 @@ import Foundation
 
 class SessionStore {
     static var session: Session?
+    static var timer: Timer?
 }

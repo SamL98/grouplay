@@ -19,7 +19,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         UserDefaults.standard.set(false, forKey: "stream-logged-in")
+        
         //UserDefaults.standard.set(false, forKey: "loggedIn")
+        UserDefaults.standard.set(false, forKey: "sessInit")
+        UserDefaults.standard.set(false, forKey: "timerStarted")
+        
         if UserDefaults.standard.string(forKey: "uid") == nil {
             UserDefaults.standard.set(Utility.generateRandomStr(with: 20), forKey: "uid")
         }
@@ -60,24 +64,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    func invalidateTimers() {
+        if let timer = SessionStore.timer { timer.invalidate() }
+        UserDefaults.standard.set(false, forKey: "timerStarted")
+    }
+    
+    func saveState() {
+        guard let sess = SessionStore.session else { return }
+        UserDefaults.standard.set(sess, forKey: "currSession")
+    }
+    
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+        
+        saveState()
+        invalidateTimers()
         NotificationCenter.default.post(name: Notification.Name(rawValue: "update-time"), object: nil, userInfo: nil)
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        saveState()
+        invalidateTimers()
         FirebaseManager.shared.leave()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        
+        if let savedSess = UserDefaults.standard.object(forKey: "currSession") as? Session {
+            SessionStore.session = savedSess
+        }
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        guard SessionStore.session != nil else { return }
+        FirebaseManager.shared.enter()
+        FirebaseManager.shared.refresh()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

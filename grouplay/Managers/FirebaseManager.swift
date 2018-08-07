@@ -30,7 +30,7 @@ class FirebaseManager {
         ], withCompletionBlock: { (err, _) in
             if err == nil {
                 self.sessRef = Database.database().reference().child("sessions").child(code)
-                self.sess = Session(owner: uid, members: [], approved: [], pending: [])
+                self.sess = Session(id: code, owner: uid, members: [:], approved: [], pending: [])
                 completion(code, nil)
             } else {
                 completion(nil, "\(err!)")
@@ -40,9 +40,6 @@ class FirebaseManager {
     
     // Attempt to join a session given a code.
     func joinSession(code: String, completion: @escaping (Session?, String?) -> Void) {
-        guard let uid = UserDefaults.standard.string(forKey: "uid") else {
-            return
-        }
         dbRef.child("sessions").child(code).observeSingleEvent(of: .value, with: { (snapshot) in
             guard let dict = snapshot.value as? [String:AnyObject] else {
                 completion(nil, "Unable to parse snapshot value")
@@ -52,9 +49,6 @@ class FirebaseManager {
                 completion(nil, "Unable to parse owner from snapshot")
                 return
             }
-            
-            var members = dict["members"] as? [String] ?? []
-            if !members.contains(uid) { members.append(uid) }
             
             var approved: [Track] = []
             var pending: [Track] = []
@@ -68,20 +62,54 @@ class FirebaseManager {
                 }
             }
             
+            let members = dict["members"] as? [String:[String:AnyObject]] ?? [String:[String:AnyObject]]()
+            
             self.sessRef = Database.database().reference().child("sessions").child(code)
-            self.sessRef?.child("members").setValue(members)
-            self.sess = Session(owner: owner, members: members, approved: approved, pending: pending)
+            self.sess = Session(id: code, owner: owner, members: members, approved: approved, pending: pending)
+            
             completion(self.sess, nil)
         })
     }
     
+    func enter() {
+        guard let uid = UserDefaults.standard.string(forKey: "uid") else { return }
+        
+        var members = SessionStore.session?.members ?? [String:[String:AnyObject]]()
+        members[uid] = [
+            "username": (UserDefaults.standard.string(forKey: "user_id") ?? "username") as AnyObject,
+            "has_premium": UserDefaults.standard.bool(forKey: "hasPremium") as AnyObject
+        ]
+        
+        sessRef?.child("members").setValue(members)
+        
+        if let session = SessionStore.session, uid == session.owner {
+            sessRef?.child("tmp_owner").removeValue()
+        }
+    }
+    
     // Remove the current user from the current session
     func leave() {
-        guard let uid = UserDefaults.standard.string(forKey: "uid") else {
-            return
+        guard let uid = UserDefaults.standard.string(forKey: "uid") else { return }
+        
+        let members = (SessionStore.session?.members.removeValue(forKey: uid) as? [String:[String:AnyObject]]) ?? [String:[String:AnyObject]]()
+        sessRef?.child("members").setValue(members as [String:AnyObject])
+        
+        if let session = SessionStore.session, uid == session.owner {
+            let premiumMembers = members.filter({ ($0.value["has_premium"] as? Bool) ?? false })
+            let choice = arc4random_uniform(UInt32(premiumMembers.count))
+            var newOwner: String = uid
+            
+            var i = 0
+            for (k, _) in premiumMembers {
+                if i == choice {
+                    newOwner = k
+                    break
+                }
+                i += 1
+            }
+            
+            sessRef?.child("tmp_owner").setValue(newOwner)
         }
-        let members = SessionStore.session == nil ? [] : SessionStore.session!.members.filter({ $0 != uid })
-        sessRef?.child("members").setValue(members)
     }
     
     // Parse a dictionary into a Track object.
@@ -103,7 +131,7 @@ class FirebaseManager {
             }
             return parseTrack(id: subDict.key, trackDict: trackDict)
         }
-        return queue.filter{ $0.title != "" }
+        return queue.filter{ $0.title != "" }.sorted(by: { $0.timestamp < $1.timestamp })
     }
     
     // Observe the realtime current track in the database. Only called if the session is not owned by the current user.
@@ -113,6 +141,7 @@ class FirebaseManager {
             completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
             return
         }
+        
         sessRef?.child("current").observe(.value, with: { snap in
             if let pausedVal = snap.value as? Bool {
                 NotificationCenter.default.post(name: Notification.Name(rawValue: "paused-changed"), object: nil, userInfo: ["paused": pausedVal])
@@ -123,9 +152,10 @@ class FirebaseManager {
                 completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
                 return
             }
+            
             guard let id = val["id"] as? String, let title = val["title"] as? String,
                 let artist = val["artist"] as? String, let imgUrl = val["imageURL"] as? String,
-                let timeLeft = val["time_left"] as? Int, let duration = val["duration"] as? Int,
+                var timeLeft = val["time_left"] as? Int, let duration = val["duration"] as? Int,
                 let timestamp = val["timestamp"] as? UInt64,
                 let paused = val["paused"] as? Bool else {
                     //print("irrelevant info in current dict")
@@ -133,7 +163,9 @@ class FirebaseManager {
                     return
             }
             let track = Track(title: title, artist: artist, trackID: id, imageURL: URL(string: imgUrl)!, image: nil, preview: nil, duration: duration, timestamp: timestamp)
-            //timeLeft -= Int((Date.now() - timestamp)/1000)
+            timeLeft -= Int((Date.now() - timestamp)/1000)
+            
+            SessionStore.session?.current = (track, timeLeft, timestamp, !paused)
             completion(track, timeLeft, paused,  nil)
         }, withCancel: { err in
             print("could not fetch current (firebase): \(err)")
@@ -160,6 +192,34 @@ class FirebaseManager {
                 sess.pending = self.parseQueue(dict: pendingDict)
             }
             completion(nil)
+        })
+    }
+    
+    func refresh() {
+        guard sessRef != nil else {
+            print("sess ref is nil")
+            return
+        }
+        
+        sessRef?.observeSingleEvent(of: .value, with: { snap in
+            guard let val = snap.value as? [String:AnyObject] else { return }
+            
+            if let approvedDict = (val["queue"] as? [String:AnyObject])?["approved"] as? [String:AnyObject] {
+                SessionStore.session?.approved = self.parseQueue(dict: approvedDict)
+            }
+            if let pendingDict = (val["queue"] as? [String:AnyObject])?["pending"] as? [String:AnyObject] {
+                SessionStore.session?.approved = self.parseQueue(dict: pendingDict)
+            }
+            
+            if let currDict = val["current"] as? [String:AnyObject] {
+                guard let trackId = currDict["id"] as? String else { return }
+                
+                let currTrack = self.parseTrack(id: trackId, trackDict: currDict)
+                guard let timeLeft = currDict["time_left"] as? Int,
+                    let paused = currDict["paused"] as? Bool else { return }
+                
+                SessionStore.session?.current = (currTrack, timeLeft, currTrack.timestamp, !paused)
+            }
         })
     }
     
@@ -235,6 +295,8 @@ class FirebaseManager {
     
     // Set the current track in the database. Only called if the session is owned by the current user.
     func setCurrent(_ track: Track, timeLeft: Int, paused: Bool) {
+        let ts = Date.now()
+        
         sessRef?.child("current").setValue([
             "id": track.trackID,
             "title": track.title,
@@ -242,14 +304,16 @@ class FirebaseManager {
             "imageURL": "\(track.albumImageURL)",
             "time_left": timeLeft,
             "duration": track.duration,
-            "timestamp": Date.now(),
+            "timestamp": ts,
             "paused": paused
             ])
+        
+        SessionStore.session?.current = (track, timeLeft, ts, !paused)
     }
     
     // Enqueue the given track in the database. If the current user is the owner, it is automatically set to approved. Otherwise, it is pending.
     func enqueue(_ track: Track, pending: Bool) {
-        insert(track, pending: pending, before: Date.now())
+        insert(track, pending: false, before: Date.now())
     }
     
     // Remove the given track from the database queue.

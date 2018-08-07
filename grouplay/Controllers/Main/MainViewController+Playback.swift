@@ -54,8 +54,14 @@ extension MainViewController {
         prev.append(current)
         guard SessionStore.session!.approved.count > 0 else {
             print("no remaining songs in queue")
-            NotificationCenter.default.addObserver(self, selector: #selector(queueChanged), name: Notification.Name(rawValue: "queue-changed"), object: nil)
-            paused = true
+            //NotificationCenter.default.addObserver(self, selector: #selector(queueChanged), name: Notification.Name(rawValue: "queue-changed"), object: nil)
+            //paused = true
+            
+            if isOwner {
+                let idx = Int(arc4random_uniform(UInt32(self.tracks.count)))
+                let indexPath = IndexPath(row: idx, section: 0)
+                self.tableView(self.tableView, didSelectRowAt: indexPath)
+            }
             return
         }
         let nextUp = SessionStore.session!.approved[0].trackID
@@ -74,13 +80,13 @@ extension MainViewController {
     
     // Pause playback if currently playing. Otherwise, unpause playback.
     @objc func togglePause() {
-        guard current != nil else {
-            return
-        }
+        guard current != nil else { return }
+        
         if !firstPlayOccurred && paused {
             firstPlayOccurred = true
             SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + current.trackID, startingWith: 0, startingWithPosition: Double(current.duration)/1000.0 - Double(timeLeft), callback: nil)
         }
+        
         SpotifyManager.shared.player.setIsPlaying(paused, callback: nil)
         paused = !paused
     }
@@ -89,6 +95,12 @@ extension MainViewController {
     @objc func skip() {
         guard SessionStore.session!.approved.count > 0 else {
             print("no remaining items in queue")
+            
+            if isOwner {
+                let idx = Int(arc4random_uniform(UInt32(self.tracks.count)))
+                let indexPath = IndexPath(row: idx, section: 0)
+                self.tableView(self.tableView, didSelectRowAt: indexPath)
+            }
             return
         }
         SpotifyManager.shared.player.seek(to: TimeInterval(current.duration/1000), callback: nil)

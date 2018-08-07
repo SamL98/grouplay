@@ -45,11 +45,15 @@ extension MainViewController {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isOwner {
             SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
+                
                 self.firstPlayOccurred = true
                 self.current = self.tracks[indexPath.row]
+                
                 self.timeLeft = Int(self.current.duration/1000)
                 self.arcLayer.timeLimit = self.timeLeft
+                
                 self.paused = false
+                
                 self.showCurrView()
                 self.updateCurrDisplay()
             })

@@ -24,18 +24,28 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     @IBOutlet weak var pauseButton: UIButton!
     @IBOutlet weak var nextButton: UIButton!
     @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var saveButton: UIButton!
     
     var isOwner = false {
         didSet {
             if isOwner {
                 SpotifyManager.shared.player.delegate = self
                 SpotifyManager.shared.player.playbackDelegate = self
-                SpotifyManager.shared.initPlayer()
+                
+                if !UserDefaults.standard.bool(forKey: "sessInit") {
+                    SpotifyManager.shared.initPlayer()
+                    UserDefaults.standard.set(true, forKey: "sessInit")
+                }
             }
         }
     }
     
-    var current: Track!
+    var current: Track! {
+        didSet {
+            guard current != nil else { return }
+            self.saved = self.library.contains(where: { $0.trackID == current.trackID })
+        }
+    }
     var tracks = [Track]()
     var prev = [Track]()
     var library = [Track]()
@@ -59,7 +69,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var timer: Timer!
     var timerStarted = false
     
-    var currViewDisplayed = true
+    var currViewDisplayed = false
     var playbackDisplayed = false
     
     var swipe: UISwipeGestureRecognizer!
@@ -68,12 +78,30 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var arcLayer: ArcLayer!
     
+    var isSearching = false
+    var lastKeystroke: UInt64 = 0
+    var searchInProgress = false
+    
+    var isLibSeg = true {
+        didSet { updateSegIfNecessary() }
+    }
+    
+    var saved = false {
+        didSet {
+            let img = saved ? #imageLiteral(resourceName: "001-checkmark") : UIImage(named: "002-add")
+            saveButton.setImage(img!, for: .normal)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         searchBar.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
+        
+        tableView.keyboardDismissMode = .onDrag
+        segControl.addTarget(self, action: #selector(MainViewController.updateSeg), for: .valueChanged)
 
         arcLayer = ArcLayer(frame: view.viewWithTag(421)!.frame)
         view.viewWithTag(421)?.layer.addSublayer(arcLayer)
@@ -121,11 +149,20 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
+    @objc func updateSeg() {
+        isLibSeg = !isLibSeg
+        if isSearching { isSearching = !isSearching }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        if let savedTimerState = UserDefaults.standard.object(forKey: "timerStarted") { timerStarted = savedTimerState as! Bool }
+
         if !timerStarted {
             timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
             timerStarted = true
+            UserDefaults.standard.set(true, forKey: "timerStarted")
         }
     }
     
@@ -163,8 +200,13 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func toggleCurrView(hide: Bool) {
         let multiplier: CGFloat = hide ? -1.0 : 1.0
-        currTopConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
+        //currTopConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
         currBottomConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
+        
+        /*if currBottomConstr.constant == currTopConstr.constant {
+            currBottomConstr.constant = 0
+        }*/
+        
         UIView.animate(withDuration: 0.35, animations: { self.view.layoutIfNeeded() })
     }
     
@@ -184,8 +226,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         currViewDisplayed = true
 
         guard currTopConstr != nil && currBottomConstr != nil else {
-                print("could not find constraint")
-                return
+            print("could not find constraint")
+            return
         }
         toggleCurrView(hide: false)
     }
@@ -203,6 +245,22 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
                 self.currImageView.image = img
             }
         })
+    }
+    
+    @IBAction func toggleSave(_ sender: UIButton) {
+        guard current != nil else {
+            print("no current, stop saving")
+            return
+        }
+        if saved {
+            guard let idx = self.library.index(where: { $0.trackID == current.trackID }) else { return }
+            self.library.remove(at: idx)
+            SpotifyManager.shared.unsave(self.current)
+        } else {
+            self.library.insert(current, at: 0)
+            SpotifyManager.shared.save(self.current)
+        }
+        saved = !saved
     }
     
     @IBAction func goBack(_ sender: UIBarButtonItem) {

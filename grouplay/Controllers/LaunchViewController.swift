@@ -56,7 +56,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 alert.dismiss(animated: true, completion: nil)
                 return
             }
-            guard text.characters.count > 0 else {
+            guard text.count > 0 else {
                 alert.dismiss(animated: true, completion: nil)
                 return
             }
@@ -104,6 +104,8 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
             UserDefaults.standard.set(code, forKey: "currCode")
             SessionStore.session = sess
             
+            FirebaseManager.shared.enter()
+            
             if !self.recents.contains(code) {
                 self.recents.append(code)
                 UserDefaults.standard.set(self.recents, forKey: "recents")
@@ -141,7 +143,13 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 return
             }
             
-            SessionStore.session = Session(owner: uid, members: [], approved: [], pending: [])
+            let username = (UserDefaults.standard.string(forKey: "username") ?? "username") as AnyObject
+            let hasPremium = UserDefaults.standard.bool(forKey: "hasPremium") as AnyObject
+            let memberDict = [
+                uid: ["username": username, "has_premium": hasPremium]
+            ]
+            
+            SessionStore.session = Session(id: code!, owner: uid, members: memberDict, approved: [], pending: [])
             self.recents.append(code!)
             
             UserDefaults.standard.set(self.recents, forKey: "recents")

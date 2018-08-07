@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -14,19 +14,6 @@
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="Avenir.ttc">
-            <string>Avenir-Medium</string>
-        </array>
-        <array key="AvenirNext.ttc">
-            <string>AvenirNext-DemiBold</string>
-            <string>AvenirNext-Medium</string>
-            <string>AvenirNext-Regular</string>
-        </array>
-        <array key="GillSans.ttc">
-            <string>GillSans</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -238,7 +225,7 @@
                                     <constraint firstAttribute="width" secondItem="Kbu-eo-2Bk" secondAttribute="height" multiplier="1:1" id="w9f-Dm-1C8"/>
                                 </constraints>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qa3-kI-iD8">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qa3-kI-iD8">
                                 <rect key="frame" x="16" y="64" width="44" height="40"/>
                                 <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="20"/>
                                 <state key="normal" title="Back">
@@ -284,7 +271,7 @@
                                 <color key="tintColor" red="0.24305245540000001" green="0.78088727680000003" blue="0.55544084819999995" alpha="1" colorSpace="calibratedRGB"/>
                             </segmentedControl>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="75" estimatedRowHeight="65" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="DsL-bV-cr3">
-                                <rect key="frame" x="8" y="168" width="359" height="418"/>
+                                <rect key="frame" x="8" y="168" width="359" height="491"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="trackCell" id="n0t-NE-B52" customClass="TrackTableViewCell" customModule="grouplay" customModuleProvider="target">
@@ -337,7 +324,7 @@
                                 </prototypes>
                             </tableView>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EI5-yg-9hE">
-                                <rect key="frame" x="8" y="594" width="359" height="65"/>
+                                <rect key="frame" x="8" y="667" width="359" height="65"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="HgE-kc-4Yj">
                                         <rect key="frame" x="8" y="8" width="49.5" height="49.5"/>
@@ -375,27 +362,42 @@
                                             <constraint firstItem="7QA-xy-MFs" firstAttribute="centerX" secondItem="PHf-nN-rsL" secondAttribute="centerX" id="oSk-Yu-TeA"/>
                                         </constraints>
                                     </view>
+                                    <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Win-eh-ana">
+                                        <rect key="frame" x="278.5" y="25" width="15" height="15"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="Win-eh-ana" secondAttribute="height" multiplier="1:1" id="qHk-Wc-4Xa"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.27617730029999998" green="0.63945855029999998" blue="0.54592556420000005" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" image="002-add"/>
+                                        <connections>
+                                            <action selector="toggleSave:" destination="E3U-nN-nYe" eventType="touchUpInside" id="pB3-k4-DaC"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="HgE-kc-4Yj" firstAttribute="leading" secondItem="EI5-yg-9hE" secondAttribute="leading" constant="8" id="17x-Fp-xoL"/>
+                                    <constraint firstItem="PHf-nN-rsL" firstAttribute="leading" secondItem="Win-eh-ana" secondAttribute="trailing" constant="8" id="1Ta-Ci-Pkt"/>
                                     <constraint firstItem="PHf-nN-rsL" firstAttribute="top" secondItem="EI5-yg-9hE" secondAttribute="top" constant="8" id="2BO-lM-hT0"/>
                                     <constraint firstItem="kT9-UY-YTx" firstAttribute="leading" secondItem="HgE-kc-4Yj" secondAttribute="trailing" constant="8" id="A7O-rn-mVA"/>
                                     <constraint firstItem="PHf-nN-rsL" firstAttribute="leading" secondItem="kT9-UY-YTx" secondAttribute="trailing" constant="8" id="BzU-7J-AuZ"/>
                                     <constraint firstAttribute="height" constant="65" id="GWo-wf-71H"/>
                                     <constraint firstAttribute="bottom" secondItem="HgE-kc-4Yj" secondAttribute="bottom" constant="7.5" id="KlY-BM-fDO"/>
                                     <constraint firstItem="7b3-pK-odt" firstAttribute="top" secondItem="kT9-UY-YTx" secondAttribute="bottom" constant="8" id="U8k-MV-6JO"/>
+                                    <constraint firstItem="Win-eh-ana" firstAttribute="centerY" secondItem="EI5-yg-9hE" secondAttribute="centerY" id="XgJ-w2-Cd6"/>
                                     <constraint firstAttribute="bottom" secondItem="PHf-nN-rsL" secondAttribute="bottom" constant="7.5" id="bho-UI-u8K"/>
+                                    <constraint firstAttribute="bottom" secondItem="Win-eh-ana" secondAttribute="bottom" constant="25" id="bpe-XN-i2b"/>
                                     <constraint firstItem="PHf-nN-rsL" firstAttribute="leading" secondItem="7b3-pK-odt" secondAttribute="trailing" constant="8" id="coq-Ni-Ban"/>
                                     <constraint firstItem="HgE-kc-4Yj" firstAttribute="top" secondItem="EI5-yg-9hE" secondAttribute="top" constant="8" id="gjQ-XR-lrV"/>
                                     <constraint firstAttribute="trailing" secondItem="PHf-nN-rsL" secondAttribute="trailing" constant="8" id="gzZ-lj-4Yp"/>
                                     <constraint firstItem="kT9-UY-YTx" firstAttribute="top" secondItem="EI5-yg-9hE" secondAttribute="top" constant="8" id="jYr-mD-84Q"/>
                                     <constraint firstItem="7b3-pK-odt" firstAttribute="leading" secondItem="HgE-kc-4Yj" secondAttribute="trailing" constant="8" id="kUQ-9K-Iyk"/>
+                                    <constraint firstItem="Win-eh-ana" firstAttribute="top" secondItem="EI5-yg-9hE" secondAttribute="top" constant="25" id="wdg-La-80t"/>
                                     <constraint firstAttribute="bottom" secondItem="7b3-pK-odt" secondAttribute="bottom" constant="8.5" id="wwQ-m6-KEh"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XXv-aQ-417">
-                                <rect key="frame" x="8" y="667" width="359" height="65"/>
+                                <rect key="frame" x="8" y="740" width="359" height="65"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEb-XT-8t6">
                                         <rect key="frame" x="159" y="17" width="40" height="32"/>
@@ -439,7 +441,7 @@
                             <constraint firstItem="EI5-yg-9hE" firstAttribute="top" secondItem="DsL-bV-cr3" secondAttribute="bottom" constant="8" identifier="current-top" id="5Lh-Dg-eEk"/>
                             <constraint firstItem="5Md-7e-VrB" firstAttribute="trailing" secondItem="XXv-aQ-417" secondAttribute="trailing" constant="8" id="8Yk-lC-rig"/>
                             <constraint firstItem="V8T-Sn-J5J" firstAttribute="top" secondItem="5Md-7e-VrB" secondAttribute="top" constant="8" id="8eM-bq-31J"/>
-                            <constraint firstItem="5Md-7e-VrB" firstAttribute="bottom" secondItem="EI5-yg-9hE" secondAttribute="bottom" constant="8" identifier="current-bottom" id="BrX-Nv-1Mr"/>
+                            <constraint firstItem="5Md-7e-VrB" firstAttribute="bottom" secondItem="EI5-yg-9hE" secondAttribute="bottom" constant="-65" identifier="current-bottom" id="BrX-Nv-1Mr"/>
                             <constraint firstItem="DsL-bV-cr3" firstAttribute="leading" secondItem="5Md-7e-VrB" secondAttribute="leading" constant="8" id="FZr-cQ-Gfm"/>
                             <constraint firstItem="EI5-yg-9hE" firstAttribute="leading" secondItem="5Md-7e-VrB" secondAttribute="leading" constant="8" id="Hqv-qh-Iw1"/>
                             <constraint firstItem="5Md-7e-VrB" firstAttribute="trailing" secondItem="x70-Si-n0x" secondAttribute="trailing" constant="8" id="LR8-hV-EPe"/>
@@ -469,7 +471,7 @@
                             </barButtonItem>
                             <barButtonItem title="QR" id="vQ4-Ga-Zln">
                                 <connections>
-                                    <segue destination="qji-ki-f2d" kind="show" action="showDetailViewController:sender:" id="Njd-JL-7ts"/>
+                                    <segue destination="qji-ki-f2d" kind="show" id="Njd-JL-7ts"/>
                                 </connections>
                             </barButtonItem>
                         </rightBarButtonItems>
@@ -484,6 +486,7 @@
                         <outlet property="nextButton" destination="Fxn-s5-bEY" id="cIe-Qx-RRF"/>
                         <outlet property="pauseButton" destination="XEb-XT-8t6" id="dEE-AS-5Sy"/>
                         <outlet property="playbackView" destination="XXv-aQ-417" id="DLN-SQ-4oQ"/>
+                        <outlet property="saveButton" destination="Win-eh-ana" id="zER-jV-okZ"/>
                         <outlet property="searchBar" destination="V8T-Sn-J5J" id="sK8-oG-ArB"/>
                         <outlet property="segControl" destination="x70-Si-n0x" id="iJu-9N-zIk"/>
                         <outlet property="tableView" destination="DsL-bV-cr3" id="Aem-TD-d53"/>
@@ -598,7 +601,7 @@
         <!--Navigation Controller-->
         <scene sceneID="fns-he-Ug6">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" hidesBarsWhenKeyboardAppears="YES" id="zcb-hn-nBh" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="zcb-hn-nBh" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="p32-OA-KmL">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -615,4 +618,7 @@
             <point key="canvasLocation" x="1672" y="113.3433283358321"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="002-add" width="64" height="64"/>
+    </resources>
 </document>

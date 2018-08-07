@@ -12,7 +12,8 @@ import UIKit
 extension MainViewController {
     
     func fetchSearches(text: String, completion: @escaping () -> Void) {
-        let query = text.lowercased().replacingOccurrences(of: " ", with: "+")
+        let query = "\"\(text)\""
+        
         SpotifyManager.shared.searchTracks(query: query, offset: 0) { (optTracksArr, error) in
             guard error == nil else {
                 print("\(error!)")
@@ -28,15 +29,42 @@ extension MainViewController {
         }
     }
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+    func showNoMatchLabel() {
+        let labelWidth: CGFloat = view.frame.width/3*2
+        let label = UILabel(frame: CGRect(x: view.frame.midX-labelWidth/2, y: view.frame.midY-50.0, width: labelWidth, height: 100.0))
+        label.text = "No tracks matching search"
+        label.tag = 69
+        label.textAlignment = .center
+        view.addSubview(label)
+    }
+    
+    func hideNoMatchLabel() {
         view.viewWithTag(69)?.removeFromSuperview()
-        
-        guard NSString(string: searchText).length >= 2 else {
+    }
+    
+    func displayOrHideMatchLabel() {
+        if self.searched.count == 0 { showNoMatchLabel() }
+        else { hideNoMatchLabel() }
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MainViewController.search(searchText:)), object: nil)
+        perform(#selector(MainViewController.search(searchText:)), with: searchText, afterDelay: 0.75)
+    }
+    
+    @objc func search(searchText: String) {
+        print("searching")
+
+        guard searchText.count >= 2 else {
             if searchText == "" {
                 self.searchBar.resignFirstResponder()
-                self.tracks = self.library
+                
+                if segControl.selectedSegmentIndex == 0 {
+                    tracks = library
+                }
+                
                 DispatchQueue.main.async {
-                    self.segControl.selectedSegmentIndex = 0
+                    self.displayOrHideMatchLabel()
                     self.tableView.reloadData()
                 }
             }
@@ -44,53 +72,56 @@ extension MainViewController {
         }
         
         if segControl.selectedSegmentIndex == 0 {
-            filterTracks(text: searchText, tracksToFilter: library)
-            tableView.reloadData()
+            self.searched = filterTracks(text: searchText, tracksToFilter: library)
+            self.tracks = self.searched
+            
+            DispatchQueue.main.async {
+                self.displayOrHideMatchLabel()
+                self.tableView.reloadData()
+            }
         } else {
             fetchSearches(text: searchText) {
-                //_ = self.searched.map { print($0.title) }
                 self.tracks = self.searched
+                
                 DispatchQueue.main.async {
+                    self.displayOrHideMatchLabel()
                     self.tableView.reloadData()
                 }
             }
         }
-        
-        if tracks.count == 0 {
-            let labelWidth: CGFloat = view.frame.width/3*2
-            let label = UILabel(frame: CGRect(x: view.frame.midX-labelWidth/2, y: view.frame.midY-50.0, width: labelWidth, height: 100.0))
-            label.text = "No tracks matching search"
-            label.tag = 69
-            label.textAlignment = .center
-            view.addSubview(label)
-        } else {
-            view.viewWithTag(69)?.removeFromSuperview()
-        }
+    }
+    
+    func updateSegIfNecessary() {
+        let text = self.searchBar.text
+        if !isSearching || (text != nil && text!.count > 0) { return }
+        searchBar(self.searchBar, textDidChange: text!)
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        isSearching = true
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        print("canceled")
         self.searchBar.resignFirstResponder()
-        self.tracks = self.library
+
         DispatchQueue.main.async {
-            self.segControl.selectedSegmentIndex = 0
             self.tableView.reloadData()
+            //self.isSearching = false
         }
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        print("end editing")
         self.searchBar.resignFirstResponder()
         self.searchBar.endEditing(true)
-        self.tracks = self.library
+        
         DispatchQueue.main.async {
-            self.segControl.selectedSegmentIndex = 0
             self.tableView.reloadData()
+            //self.isSearching = false
         }
     }
     
-    func filterTracks(text: String, tracksToFilter: [Track]) {
-        tracks = tracksToFilter.filter{
+    func filterTracks(text: String, tracksToFilter: [Track]) -> [Track] {
+        return tracksToFilter.filter{
             $0.title.lowercased().contains(text.lowercased()) || $0.artist.lowercased().contains(text.lowercased())
         }
     }

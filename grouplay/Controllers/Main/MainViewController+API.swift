@@ -24,9 +24,9 @@ extension MainViewController {
     }
     
     func fetchLibrary() {
-        guard offsetCount <= 10 else {
+        /*guard offsetCount <= 10 else {
             return
-        }
+        }*/
         SpotifyManager.shared.fetchLibrary(extraParameters: ["offset": (50 * offsetCount) as AnyObject], onCompletion: { (optTracksArr, error) in
             guard error == nil else {
                 print("fetch library \(error!)")
@@ -38,10 +38,18 @@ extension MainViewController {
             }
 
             self.library.append(contentsOf: tracksArr)
+            
+            // Set the current track to itself so that its didSet will be triggered
+            // and saved will be updated.
+            //
+            // This is needed because the save will initially be set when the library array is empty.
+            let curr = self.current
+            self.current = curr
+            
             self.offsetCount += 1
             self.fetchLibrary()
             
-            if self.searchBar.text == nil || self.searchBar.text! == "" {
+            if !self.isSearching && (self.searchBar.text == nil || self.searchBar.text! == "") {
                 self.tracks = self.library
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
@@ -51,6 +59,7 @@ extension MainViewController {
     }
     
     func fetchCurr() {
+        if isOwner { return }
         FirebaseManager.shared.fetchCurrent { track, time, paused, err in
             self.parseCurr(track: track, time: time, paused: paused, err: err)
         }
@@ -63,10 +72,12 @@ extension MainViewController {
             self.hideCurrView()
             return
         }
+        
         guard track != nil && paused != nil else {
             self.hideCurrView()
             return
         }
+        
         self.current = track!
         self.paused = paused!
         
