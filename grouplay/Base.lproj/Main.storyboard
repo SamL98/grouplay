@@ -178,6 +178,16 @@
                                     <action selector="scanQR:" destination="3TS-4u-ys8" eventType="touchUpInside" id="ebn-Ru-Wpn"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vLD-cJ-fb6">
+                                <rect key="frame" x="304" y="395" width="55" height="27"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <state key="normal" title="Delete All">
+                                    <color key="titleColor" red="0.81213727680000003" green="0.1645368304" blue="0.2182477679" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="deleteAllWithSender:" destination="3TS-4u-ys8" eventType="touchUpInside" id="RgE-Fi-e2Y"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -193,6 +203,8 @@
                             <constraint firstItem="mBl-Fj-EcP" firstAttribute="top" secondItem="tGL-RW-IUk" secondAttribute="bottom" constant="20" id="WGx-Yi-z7f"/>
                             <constraint firstItem="Olj-mY-W9i" firstAttribute="trailing" secondItem="mBl-Fj-EcP" secondAttribute="trailing" constant="16" id="aKL-QE-bhI"/>
                             <constraint firstItem="5yR-na-IXQ" firstAttribute="leading" secondItem="Olj-mY-W9i" secondAttribute="leading" constant="16" id="def-Ed-eeJ"/>
+                            <constraint firstItem="Olj-mY-W9i" firstAttribute="trailing" secondItem="vLD-cJ-fb6" secondAttribute="trailing" constant="16" id="j55-RA-uIc"/>
+                            <constraint firstItem="vLD-cJ-fb6" firstAttribute="centerY" secondItem="mBl-Fj-EcP" secondAttribute="centerY" id="lF2-aE-hEB"/>
                             <constraint firstItem="Lf2-8R-YUr" firstAttribute="trailing" secondItem="Olj-mY-W9i" secondAttribute="trailing" id="n93-qa-j8H"/>
                             <constraint firstItem="VhD-aF-cpZ" firstAttribute="centerX" secondItem="mgf-1y-e4D" secondAttribute="centerX" id="noc-rW-zvi"/>
                             <constraint firstItem="tGL-RW-IUk" firstAttribute="top" secondItem="mgf-1y-e4D" secondAttribute="centerY" id="qHn-Gd-KU0"/>

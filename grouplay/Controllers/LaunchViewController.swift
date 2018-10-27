@@ -162,6 +162,27 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        var actions = [UITableViewRowAction]()
+        let remove = UITableViewRowAction(style: .destructive, title: "Remove", handler: { _, indexPath in
+            self.recents.remove(at: indexPath.row)
+            self.tableView.reloadData()
+            UserDefaults.standard.set(self.recents, forKey: "recents")
+        })
+        actions.append(remove)
+        return actions
+    }
+    
+    @IBAction func deleteAll(sender: UIButton) {
+        UserDefaults.standard.set([], forKey: "recents")
+        self.recents = []
+        tableView.reloadData()
+    }
+    
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         print("perform segue")
         print(identifier)
