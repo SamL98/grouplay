@@ -28,6 +28,13 @@ extension MainViewController {
         }
     }
     
+    func checkForShowNoMatchLabel(trackArray: [Track]) {
+        hideNoMatchLabel()
+        if trackArray.count == 0 {
+            showNoMatchLabel()
+        }
+    }
+    
     func showNoMatchLabel() {
         let labelWidth: CGFloat = view.frame.width/3*2
         let label = UILabel(frame: CGRect(x: view.frame.midX-labelWidth/2, y: view.frame.midY-50.0, width: labelWidth, height: 100.0))
@@ -47,28 +54,38 @@ extension MainViewController {
     }
     
     @objc func search(searchText: String) {
-        hideNoMatchLabel()
-        
-        guard searchText.count >= 3 else {
-            if searchText == "" {
-                if segControl.selectedSegmentIndex == 0 {
-                    tracks = library
-                }
-                
-                DispatchQueue.main.async {
-                    if self.searched.count == 0 { self.showNoMatchLabel() }
-                    self.tableView.reloadData()
-                }
+        self.segControlSearched = false
+        self.searchInputText = searchText
+        searchHelper(searchText: self.searchInputText)
+    }
+
+    func searchHelper(searchText: String) {
+        //guard searchText.count >= 3 else {
+            
+            
+        if searchText == "" {
+            if segControl.selectedSegmentIndex == 0 {
+                tracks = library
+            }
+            
+            DispatchQueue.main.async {
+                //if self.searched.count == 0 { self.showNoMatchLabel() }
+                self.tableView.reloadData()
+            }
+            if segControl.selectedSegmentIndex == 0 {
+                self.filteredLibrary = self.library
             }
             return
         }
+
         
         if segControl.selectedSegmentIndex == 0 {
-            self.searched = filterTracks(text: searchText, tracksToFilter: library)
-            self.tracks = self.searched
+            self.filteredLibrary = filterTracks(text: searchText, tracksToFilter: library)
+            self.tracks = self.filteredLibrary
             
             DispatchQueue.main.async {
-                if self.searched.count == 0 { self.showNoMatchLabel() }
+                self.checkForShowNoMatchLabel(trackArray: self.filteredLibrary)
+                //if self.searched.count == 0 { self.showNoMatchLabel() }
                 self.tableView.reloadData()
             }
         } else {
@@ -76,7 +93,8 @@ extension MainViewController {
                 self.tracks = self.searched
                 
                 DispatchQueue.main.async {
-                    if self.searched.count == 0 { self.showNoMatchLabel() }
+                    self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                    //if self.searched.count == 0 { self.showNoMatchLabel() }
                     self.tableView.reloadData()
                 }
             }
@@ -103,8 +121,6 @@ extension MainViewController {
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        print("HERE")
-        
         self.searchBar.resignFirstResponder()
         self.searchBar.endEditing(true)
         
