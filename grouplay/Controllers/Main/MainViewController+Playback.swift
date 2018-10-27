@@ -91,7 +91,12 @@ extension MainViewController {
     
     // Set the player to the duration of the current song. Then didStopPlayingTrack will be called and the next song will be played.
     @objc func skip() {
-        if paused { paused = false }
+        if paused {
+            SpotifyManager.shared.player.setIsPlaying(true, callback: nil)
+            paused = false
+            FirebaseManager.shared.setPaused(paused: paused)
+        }
+        
         if !firstPlayOccurred && current != nil {
             SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + current.trackID, startingWith: 0, startingWithPosition: 0.0, callback: { _ in
                 
