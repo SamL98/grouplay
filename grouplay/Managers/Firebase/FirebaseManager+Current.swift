@@ -80,8 +80,6 @@ extension FirebaseManager {
             "duration": track.duration,
             "timestamp": Date.now()
             ])
-        
-        SessionStore.session?.current = (track, timeLeft, ts, !paused)
     }
     
     func observePaused(sess: Session, eventOccurred: @escaping (Bool) -> Void) {
