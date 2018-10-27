@@ -50,8 +50,9 @@ extension MainViewController {
         })
     }
     
+    // Fetch curr will call once is isOwner, listen otherwise
     func fetchCurr() {
-        FirebaseManager.shared.fetchCurrent { track, time, paused, err in
+        FirebaseManager.shared.fetchCurrent(isOwner: isOwner) { track, time, paused, err in
             self.parseCurr(track: track, time: time, paused: paused, err: err)
         }
     }
@@ -69,15 +70,8 @@ extension MainViewController {
             return
         }
         
-        var pausedVal = paused == nil ? true : paused!
-        if self.current == nil && pausedVal == false {
-            pausedVal = true
-        }
-        
         DispatchQueue.main.async {
             self.current = track!
-            self.paused = pausedVal
-            
             if time != nil {
                 self.timeLeft = time!
             } else if track != nil {

@@ -202,11 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "grouplay/Managers/SpotifyManager.swift"
-            timestampString = "557252203.071939"
+            timestampString = "562344729.654215"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "341"
-            endingLineNumber = "341"
+            startingLineNumber = "343"
+            endingLineNumber = "343"
             landmarkName = "initPlayer()"
             landmarkType = "7">
          </BreakpointContent>
