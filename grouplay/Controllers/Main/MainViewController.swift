@@ -281,4 +281,23 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     @IBAction func goBack(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
     }
+    
+    @IBAction func segControlSwitch(_ sender: Any) {
+        if self.segControl.selectedSegmentIndex == 0 {
+            self.tracks = self.library
+        } else {
+            self.tracks = self.searched
+        }
+        DispatchQueue.main.async {
+            if self.tracks.count == 0 {
+                self.tracks = []
+                self.showNoMatchLabel()
+            } else {
+                self.hideNoMatchLabel()
+            }
+            self.tableView.reloadData()
+            print("DATA RELOADED")
+        }
+        print(self.tracks.count)
+    }
 }
