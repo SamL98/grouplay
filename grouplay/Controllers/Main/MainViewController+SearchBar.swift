@@ -10,7 +10,6 @@ import UIKit
 
 
 extension MainViewController {
-    
     func fetchSearches(text: String, completion: @escaping () -> Void) {
         let query = "\"\(text)\""
         
@@ -53,8 +52,8 @@ extension MainViewController {
     }
     
     @objc func search(searchText: String) {
-        //print("searching")
-
+        hideNoMatchLabel()
+        
         guard searchText.count >= 3 else {
             if searchText == "" {
                 self.searchBar.resignFirstResponder()
@@ -64,7 +63,7 @@ extension MainViewController {
                 }
                 
                 DispatchQueue.main.async {
-                    self.displayOrHideMatchLabel()
+                    if self.searched.count == 0 { self.showNoMatchLabel() }
                     self.tableView.reloadData()
                 }
             }
@@ -76,7 +75,7 @@ extension MainViewController {
             self.tracks = self.searched
             
             DispatchQueue.main.async {
-                self.displayOrHideMatchLabel()
+                if self.searched.count == 0 { self.showNoMatchLabel() }
                 self.tableView.reloadData()
             }
         } else {
@@ -84,7 +83,7 @@ extension MainViewController {
                 self.tracks = self.searched
                 
                 DispatchQueue.main.async {
-                    self.displayOrHideMatchLabel()
+                    if self.searched.count == 0 { self.showNoMatchLabel() }
                     self.tableView.reloadData()
                 }
             }
