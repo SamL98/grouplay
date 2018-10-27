@@ -2,7 +2,42 @@ import Foundation
 import OAuthSwift
 import AVFoundation
 
-class SpotifyManager {
+class SpotifyManager: NSObject, SPTSessionManagerDelegate, SPTAppRemoteDelegate, SPTAppRemotePlayerStateDelegate {
+    
+    func sessionManager(manager: SPTSessionManager, didRenew session: SPTSession) {
+        print("renewed")
+        appRemote = SPTAppRemote(configuration: config, logLevel: .debug)
+        appRemote.delegate = self
+        appRemote.connectionParameters.accessToken = session.accessToken
+        appRemote.connect()
+        
+        oauth.client.credential.oauthToken = session.accessToken
+        self.fetchUserID()
+        UserDefaults.standard.set(sessManager.session?.refreshToken, forKey: "refreshToken")
+        UserDefaults.standard.set(true, forKey: "loggedIn")
+        NotificationCenter.default.post(name: NSNotification.Name("login"), object: nil)
+    }
+    
+    func sessionManager(manager: SPTSessionManager, didFailWith error: Error) {
+        print("session manager failed")
+    }
+    
+    func playerStateDidChange(_ playerState: SPTAppRemotePlayerState) {
+        print("playerstate: \(playerState)")
+    }
+    
+    func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
+        print("established connection")
+    }
+    
+    func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
+        print("app disconnected")
+    }
+    
+    func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
+        print("connection failed")
+    }
+    
     
     // Callback response typealias
     typealias spotify_track_response = ([Track]?, NSError?) -> Void
@@ -45,105 +80,37 @@ class SpotifyManager {
     let webView = WebView()
     let oauth = OAuth2Swift(consumerKey: Constants.Keys.client_id, consumerSecret: Constants.Keys.client_secret, authorizeUrl: URLs.authorize_url, accessTokenUrl: URLs.access_token_url, responseType: Constants.Components.response_type, contentType: Constants.Components.content_type)
     
-    var session: SPTSession!
-    var player: SPTAudioStreamingController!
+    var config: SPTConfiguration!
+    var sessManager: SPTSessionManager!
+    var appRemote: SPTAppRemote!
     
     // MARK: Authentication
     // For information on how authentication is done, look at both OAuthSwift documentation and the Spotify API OAuth guide.
     
-    var loginComp: (() -> Void)!
-    
-    func login(onCompletion: @escaping () -> Void) {
-        print("logging in to spotify")
-
-        if !SPTAuth.supportsApplicationAuthentication() {
-            UserDefaults.standard.set(false, forKey: "appAuthUsed")
-            oauth.authorize(withCallbackURL: URLs.redirect_uri, scope: Constants.Components.scopes, state: Constants.Components.state, success: { (credential, response, parameters) in
-                print("login successful")
-                self.fetchUserID()
-                self.defaults.set(true, forKey: "loggedIn")
-                UserDefaults.standard.set(parameters["refresh_token"], forKey: "refreshToken")
-                onCompletion()
-            }, failure: { (error: Error) in
-                print("error while logging into spotify: \(error)")
-                onCompletion()
-            })
-        } else {
-            UserDefaults.standard.set(true, forKey: "appAuthUsed")
-            
-            SPTAuth.defaultInstance().clientID = Constants.Keys.client_id
-            SPTAuth.defaultInstance().redirectURL = URLs.redirect_uri
-            SPTAuth.defaultInstance().sessionUserDefaultsKey = "spotifySessionKey"
-            SPTAuth.defaultInstance().requestedScopes = [SPTAuthStreamingScope, SPTAuthUserLibraryReadScope, SPTAuthUserLibraryModifyScope, SPTAuthPlaylistReadPrivateScope, SPTAuthPlaylistModifyPublicScope, SPTAuthPlaylistReadCollaborativeScope]
-            
-            var url = SPTAuth.defaultInstance().spotifyAppAuthenticationURL()!
-            var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-            var qs = (comps.queryItems)!
-            var i = 0
-            while i < qs.count {
-                if qs[i].name == "response_type" {
-                    qs[i].value = "code"
-                    break
-                }
-                i += 1
-            }
-            comps.queryItems = qs
-            url = comps.url!
-
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            
-            SpotifyManager.shared.loginComp = onCompletion
-            NotificationCenter.default.addObserver(self, selector: #selector(SpotifyManager.finishLogin(n:)), name: NSNotification.Name("authURLOpened"), object: nil)
-        }
+    func configure() {
+        config = SPTConfiguration(clientID: Constants.Keys.client_id, redirectURL: URLs.redirect_uri)
+        config.tokenRefreshURL = URL(string: "http://localhost:1234/refresh")
+        config.tokenSwapURL = URL(string: "http://localhost:1234/swap")
+        sessManager = SPTSessionManager(configuration: config, delegate: self)
     }
     
-    @objc func finishLogin(n: Notification) {
-        guard let info = n.userInfo else {
-            print("no user info")
-            return
-        }
-        guard let code = info["code"] as? String else {
-            print("no code: \(info)")
-            return
-        }
-        _ = oauth.client.post(
-        "https://accounts.spotify.com/api/token",
-        parameters: [
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": URLs.redirect_uri
-        ],
-        headers: ["Authorization": createRefreshTokenAuthorizationHeader()],
-        success: { (response) in
-            let data = response.data
-            var json: [String:AnyObject]
-            do {
-                try json = JSONSerialization.jsonObject(with: data, options: []) as! [String:AnyObject]
-            } catch let error as NSError {
-                print("unable to serialize code json: \(error)")
-                return
-            }
-            guard let accessToken = json["access_token"] as? String else {
-                print("no access token: \(json)")
-                return
-            }
-            self.oauth.client.credential.oauthToken = accessToken
-            
-            guard let refreshToken = json["refresh_token"] as? String else {
-                print("no refresh token: \(json)")
-                return
-            }
-            
-            print("login successful")
-            
-            self.fetchUserID()
-            UserDefaults.standard.set(refreshToken, forKey: "refreshToken")
-            UserDefaults.standard.set(true, forKey: "loggedIn")
-            
-            SpotifyManager.shared.loginComp()
-        }, failure: { error in
-            print("error getting auth and refresh token: \(error)")
-        })
+    func login() {
+        print("Logging in to spotify")
+        sessManager.initiateSession(with: [.streaming, .userLibraryRead, .userLibraryModify, .playlistReadPrivate, .playlistModifyPublic, .playlistReadCollaborative], options: .default)
+    }
+    
+    func sessionManager(manager: SPTSessionManager, didInitiate session: SPTSession) {
+        print("Session initiated")
+        appRemote = SPTAppRemote(configuration: config, logLevel: .debug)
+        appRemote.delegate = self
+        appRemote.connectionParameters.accessToken = session.accessToken
+        appRemote.connect()
+        
+        oauth.client.credential.oauthToken = session.accessToken
+        self.fetchUserID()
+        UserDefaults.standard.set(sessManager.session?.refreshToken, forKey: "refreshToken")
+        UserDefaults.standard.set(true, forKey: "loggedIn")
+        NotificationCenter.default.post(name: NSNotification.Name("login"), object: nil)
     }
     
     func refreshAuthToken(onCompletion: @escaping () -> Void) {
@@ -332,27 +299,6 @@ class SpotifyManager {
     }
     
     // MARK: Playback
-    
-    func initPlayer() {
-        do {
-            try player.start(withClientId: Constants.Keys.client_id)
-        } catch let error as NSError {
-            print("error starting player: \(error)")
-            return
-        }
-        player.login(withAccessToken: oauth.client.credential.oauthToken)
-        
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers)
-            do {
-                try AVAudioSession.sharedInstance().setActive(true)
-            } catch let error as NSError {
-                print(error.localizedDescription)
-            }
-        } catch let error as NSError {
-            print(error.localizedDescription)
-        }
-    }
     
     func reactivateSession() {
         try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers)

@@ -27,51 +27,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if UserDefaults.standard.string(forKey: "uid") == nil {
             UserDefaults.standard.set(Utility.generateRandomStr(with: 20), forKey: "uid")
         }
+        
         FirebaseApp.configure()
-        SpotifyManager.shared.player = SPTAudioStreamingController.sharedInstance()
+        SpotifyManager.shared.configure()
         
         return true
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        if !UserDefaults.standard.bool(forKey: "appAuthUsed") {
-            if let host = url.host {
-                if host == "spotify" {
-                    OAuthSwift.handle(url: url)
-                }
-            }
-        } else if let scheme = url.scheme, scheme == "grouplay-callback" {
-            var comps = URLComponents(url: url, resolvingAgainstBaseURL: false)!
-            var qs = comps.queryItems!
-            var i = 0
-            var optCode: String? = nil
-            while i < qs.count {
-                if qs[i].name == "code" {
-                    optCode = qs[i].value
-                    break
-                }
-                i += 1
-            }
-            guard let code = optCode else {
-                print("code not found: \(url)")
-                return false
-            }
-            NotificationCenter.default.post(
-                name: NSNotification.Name("authURLOpened"),
-                object: nil,
-                userInfo: ["code": code])
-        }
+        SpotifyManager.shared.sessManager.application(app, open: url, options: options)
         return true
-    }
-    
-    func invalidateTimers() {
-        if let timer = SessionStore.timer { timer.invalidate() }
-        UserDefaults.standard.set(false, forKey: "timerStarted")
-    }
-    
-    func saveState() {
-        guard let sess = SessionStore.session else { return }
-        UserDefaults.standard.set(sess, forKey: "currSession")
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
@@ -83,10 +48,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
-        saveState()
-        invalidateTimers()
-        
-        SpotifyManager.shared.player.playbackDelegate = nil
         SpotifyManager.shared.deactivateSession()
     }
 

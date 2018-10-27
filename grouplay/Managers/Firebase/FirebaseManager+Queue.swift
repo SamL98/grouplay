@@ -37,6 +37,20 @@ extension FirebaseManager {
             ])
     }
     
+    func fetchQueue(comp: @escaping () -> Void) {
+        guard sessRef != nil else { return }
+        sessRef!.child("queue").child("approved").observeSingleEvent(of: .value, with: { snap in
+            guard let val = snap.value as? [String:AnyObject] else {
+                print("no dict from fetch queue snap")
+                return
+            }
+            
+            let queue = self.parseQueue(dict: val)
+            SessionStore.session?.approved = queue
+            comp()
+        })
+    }
+    
     // MARK: Observers
     
     // Observe additions and removals from both the approved and pending queues.

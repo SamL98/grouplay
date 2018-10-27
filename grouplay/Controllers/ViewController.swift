@@ -19,22 +19,20 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         if UserDefaults.standard.bool(forKey: "loggedIn") {
-            SpotifyManager.shared.refreshAuthToken() {
-                self.performSegue(withIdentifier: "to launch", sender: nil)
-            }
+            SpotifyManager.shared.sessManager.renewSession()
         }
     }
     
-    @objc func finishLogin(comp: @escaping () -> Void) {
-        comp()
+    @objc func finishLogin() {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name("login"), object: nil)
+        DispatchQueue.main.async {
+            self.performSegue(withIdentifier: "to launch", sender: nil)
+        }
     }
 
     @IBAction func login(_ sender: UIButton) {
-        SpotifyManager.shared.login {
-            DispatchQueue.main.async {
-                self.performSegue(withIdentifier: "to launch", sender: nil)
-            }
-        }
+        NotificationCenter.default.addObserver(self, selector: #selector(ViewController.finishLogin), name: NSNotification.Name("login"), object: nil)
+        SpotifyManager.shared.login()
     }
     
 }

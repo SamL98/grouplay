@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, SPTAudioStreamingDelegate, SPTAudioStreamingPlaybackDelegate {
+class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
 
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var segControl: UISegmentedControl!
@@ -30,7 +30,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             guard isOwner else { return }
             
             if !UserDefaults.standard.bool(forKey: "sessInit") {
-                SpotifyManager.shared.initPlayer()
                 UserDefaults.standard.set(true, forKey: "sessInit")
             }
         }
@@ -62,7 +61,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // Time left in the current track
     var timeLeft = 0
-    
     var firstPlayOccurred = false
     
     // When we update pause, we want to do one thing:
@@ -74,6 +72,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             
             let title = paused ? "Play" : "Pause"
             pauseButton.setTitle(title, for: .normal)
+            
+            FirebaseManager.shared.setPaused(paused: paused)
         }
     }
     
@@ -103,7 +103,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // Whether or not the current track is saved in the user's library
     var saved = false {
         didSet {
-            let img = saved ? #imageLiteral(resourceName: "001-checkmark") : UIImage(named: "002-add")
+            let img = saved ? UIImage(named: "001-checkmark") : UIImage(named: "002-add")
             saveButton.setImage(img!, for: .normal)
         }
     }
@@ -149,9 +149,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         // We only want to start the timer if we are the owner of the session
         if !isOwner { return }
         
-        SpotifyManager.shared.player.delegate = self
-        SpotifyManager.shared.player.playbackDelegate = self
-        
         // If the app is entering the foreground after resigning active, then the timer will have been invalidated
         // therefore, we want to start the timer again in that case.
         if let savedTimerState = UserDefaults.standard.object(forKey: "timerStarted") { timerStarted = savedTimerState as! Bool }
@@ -166,7 +163,12 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // MARK: Timer Methods
     
     @objc func decrementTimer() {
-        if !paused { timeLeft -= 1 }
+        if !paused {
+            timeLeft -= 1
+            if timeLeft <= 0 {
+                skip()
+            }
+        }
     }
     
     // MARK: current didSet

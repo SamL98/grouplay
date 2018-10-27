@@ -48,7 +48,12 @@ extension MainViewController {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard isOwner else { return }
         
-        SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
+        SpotifyManager.shared.appRemote.playerAPI?.play("spotify:track:"+self.tracks[indexPath.row].trackID, callback: { (result, err) in
+            print(result, err)
+            guard err == nil else {
+                print("error playing track")
+                return
+            }
             self.firstPlayOccurred = true
             self.paused = false
             self.current = self.tracks[indexPath.row]
