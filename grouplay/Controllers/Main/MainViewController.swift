@@ -290,21 +290,23 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             if !segControlSearched {
                 search(searchText: self.searchInputText)
                 segControlSearched = true
-            }
-            self.tracks = self.filteredLibrary
-            DispatchQueue.main.async {
-                self.checkForShowNoMatchLabel(trackArray: self.filteredLibrary)
-                self.tableView.reloadData()
+            } else {
+                DispatchQueue.main.async {
+                    self.tracks = self.filteredLibrary
+                    self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                    self.tableView.reloadData()
+                }
             }
         } else {
             if !segControlSearched {
                 search(searchText: self.searchInputText)
                 segControlSearched = true
-            }
-            self.tracks = self.searched
-            DispatchQueue.main.async {
-                self.checkForShowNoMatchLabel(trackArray: self.searched)
-                self.tableView.reloadData()
+            } else {
+                DispatchQueue.main.async {
+                    self.tracks = self.searched
+                    self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                    self.tableView.reloadData()
+                }
             }
         }
     }
