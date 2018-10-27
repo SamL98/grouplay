@@ -57,6 +57,9 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     var prev = [Track]() // the previous tracks played so that the owner can go to the previous song indefinitely
     var library = [Track]() // the current user's library
     var searched = [Track]() // the result of the current search if searching
+    var filteredLibrary = [Track]()
+    var searchInputText = ""
+    var segControlSearched = false
     
     var offsetCount = 0 // offset count for fetching the user's library
     
@@ -284,20 +287,25 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     @IBAction func segControlSwitch(_ sender: Any) {
         if self.segControl.selectedSegmentIndex == 0 {
-            self.tracks = self.library
-        } else {
-            self.tracks = self.searched
-        }
-        DispatchQueue.main.async {
-            if self.tracks.count == 0 {
-                self.tracks = self.searched
-                self.showNoMatchLabel()
-            } else {
-                self.hideNoMatchLabel()
+            if !segControlSearched {
+                search(searchText: self.searchInputText)
+                segControlSearched = true
             }
-            self.tableView.reloadData()
-            print("DATA RELOADED")
+            self.tracks = self.filteredLibrary
+            DispatchQueue.main.async {
+                self.checkForShowNoMatchLabel(trackArray: self.filteredLibrary)
+                self.tableView.reloadData()
+            }
+        } else {
+            if !segControlSearched {
+                search(searchText: self.searchInputText)
+                segControlSearched = true
+            }
+            self.tracks = self.searched
+            DispatchQueue.main.async {
+                self.checkForShowNoMatchLabel(trackArray: self.searched)
+                self.tableView.reloadData()
+            }
         }
-        print(self.tracks.count)
     }
 }
