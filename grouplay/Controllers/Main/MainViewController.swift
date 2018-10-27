@@ -290,7 +290,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
         DispatchQueue.main.async {
             if self.tracks.count == 0 {
-                self.tracks = []
+                self.tracks = self.searched
                 self.showNoMatchLabel()
             } else {
                 self.hideNoMatchLabel()
