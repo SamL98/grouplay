@@ -60,42 +60,36 @@ extension MainViewController {
     }
 
     func search(searchText: String) {
-        //guard searchText.count >= 3 else {
-            
-            
         if searchText == "" {
             if segControl.selectedSegmentIndex == 0 {
-                tracks = library
-            }
-            
-            DispatchQueue.main.async {
-                //if self.searched.count == 0 { self.showNoMatchLabel() }
-                self.tableView.reloadData()
-            }
-            if segControl.selectedSegmentIndex == 0 {
-                self.filteredLibrary = self.library
-            }
-            return
-        }
-
-        
-        if segControl.selectedSegmentIndex == 0 {
-            self.filteredLibrary = filterTracks(text: searchText, tracksToFilter: library)
-            self.tracks = self.filteredLibrary
-            
-            DispatchQueue.main.async {
-                self.checkForShowNoMatchLabel(trackArray: self.filteredLibrary)
-                //if self.searched.count == 0 { self.showNoMatchLabel() }
-                self.tableView.reloadData()
+                DispatchQueue.main.async {
+                    self.filteredLibrary = self.library
+                    self.tracks = self.filteredLibrary
+                    self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                    self.tableView.reloadData()
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.tracks = self.searched
+                    self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                    self.tableView.reloadData()
+                }
             }
         } else {
-            fetchSearches(text: searchText) {
-                self.tracks = self.searched
-                
+            if segControl.selectedSegmentIndex == 0 {
                 DispatchQueue.main.async {
+                    self.filteredLibrary = self.filterTracks(text: searchText, tracksToFilter: self.library)
+                    self.tracks = self.filteredLibrary
                     self.checkForShowNoMatchLabel(trackArray: self.tracks)
-                    //if self.searched.count == 0 { self.showNoMatchLabel() }
                     self.tableView.reloadData()
+                }
+            } else {
+                self.fetchSearches(text: searchText) {
+                    DispatchQueue.main.async {
+                        self.tracks = self.searched
+                        self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                        self.tableView.reloadData()
+                    }
                 }
             }
         }
