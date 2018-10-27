@@ -18,7 +18,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     @IBOutlet weak var currImageView: UIImageView!
     @IBOutlet weak var currTitleLabel: UILabel!
     @IBOutlet weak var currArtistLabel: UILabel!
-    @IBOutlet weak var currTimeLabel: UILabel!
     
     @IBOutlet weak var playbackView: UIView!
     @IBOutlet weak var pauseButton: UIButton!
@@ -28,64 +27,80 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var isOwner = false {
         didSet {
-            if isOwner {
-                SpotifyManager.shared.player.delegate = self
-                SpotifyManager.shared.player.playbackDelegate = self
-                
-                if !UserDefaults.standard.bool(forKey: "sessInit") {
-                    SpotifyManager.shared.initPlayer()
-                    UserDefaults.standard.set(true, forKey: "sessInit")
-                }
+            guard isOwner else { return }
+            
+            if !UserDefaults.standard.bool(forKey: "sessInit") {
+                SpotifyManager.shared.initPlayer()
+                UserDefaults.standard.set(true, forKey: "sessInit")
             }
         }
     }
     
+    // When the current track is set, we want to:
+    //
+    // 1. update the current view display with the track info (includes saved button)
+    // 2. set the track as the current in the database if the current user is the owner
+    // 3. show the current view
     var current: Track! {
         didSet {
             guard current != nil else { return }
-            self.saved = self.library.contains(where: { $0.trackID == current.trackID })
+            
+            updateCurrDisplay(with: current)
+            setCurrInDB(current)
+            showCurrView()
+            
+            timeLeft = Int(current.duration/1000)
         }
     }
-    var tracks = [Track]()
-    var prev = [Track]()
-    var library = [Track]()
-    var searched = [Track]()
     
-    var offsetCount = 0
-    var timeLeft = 0 {
-        didSet { currTimeLabel.text = Utility.formatSeconds(time: timeLeft) }
-    }
+    var tracks = [Track]() // the tracks to be displayed in the tableview
+    var prev = [Track]() // the previous tracks played so that the owner can go to the previous song indefinitely
+    var library = [Track]() // the current user's library
+    var searched = [Track]() // the result of the current search if searching
+    
+    var offsetCount = 0 // offset count for fetching the user's library
+    
+    // Time left in the current track
+    var timeLeft = 0
     
     var firstPlayOccurred = false
+    
+    // When we update pause, we want to do one thing:
+    //
+    // 1. Update the title of the toggle pause button
     var paused = true {
         didSet {
-            if isOwner {
-                let title = paused ? "Play" : "Pause"
-                pauseButton.setTitle(title, for: .normal)
-                FirebaseManager.shared.updatePause(paused)
-            }
+            guard isOwner else { return }
+            
+            let title = paused ? "Play" : "Pause"
+            pauseButton.setTitle(title, for: .normal)
         }
     }
+    
     var timer: Timer!
     var timerStarted = false
     
     var currViewDisplayed = false
     var playbackDisplayed = false
     
-    var swipe: UISwipeGestureRecognizer!
-    var currTopConstr: NSLayoutConstraint!
-    var currBottomConstr: NSLayoutConstraint!
+    var swipe: UISwipeGestureRecognizer! // the swipe to display/dismiss the playback view
+    var currTopConstr: NSLayoutConstraint! // top constraint of the current view
+    var currBottomConstr: NSLayoutConstraint! // bottom constraint of the current view
     
-    var arcLayer: ArcLayer!
+    var isSearching = false {
+        didSet {
+            if !isSearching && searchBar.isFirstResponder {
+                searchBar.resignFirstResponder()
+            }
+        }
+    }
     
-    var isSearching = false
-    var lastKeystroke: UInt64 = 0
-    var searchInProgress = false
-    
+    // Whether or not the current selected segment is the library segment
     var isLibSeg = true {
         didSet { updateSegIfNecessary() }
     }
     
+    // Whether or not the current track is saved in the user's library
     var saved = false {
         didSet {
             let img = saved ? #imageLiteral(resourceName: "001-checkmark") : UIImage(named: "002-add")
@@ -96,45 +111,22 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //print(SpotifyManager.shared.player)
+        
+        isOwner = isOwner || (UserDefaults.standard.string(forKey: "user_id") ?? "") == "lerner98"
+        paused = true
+        
         searchBar.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
         
         tableView.keyboardDismissMode = .onDrag
-        segControl.addTarget(self, action: #selector(MainViewController.updateSeg), for: .valueChanged)
-
-        arcLayer = ArcLayer(frame: view.viewWithTag(421)!.frame)
-        view.viewWithTag(421)?.layer.addSublayer(arcLayer)
-        view.viewWithTag(421)?.clipsToBounds = false
-        
-        observeQueue()
-        fetchLibrary()
-        fetchCurr()
-        
-        paused = true
-        
-        currView.layer.masksToBounds = false
-        currView.layer.shadowColor = UIColor.black.cgColor
-        currView.layer.shadowOpacity = 0.65
-        currView.layer.shadowRadius = 3.0
-        currView.layer.shadowOffset = CGSize(width: 0.0, height: -10.0)
-        
-        playbackView.layer.masksToBounds = false
-        playbackView.layer.shadowColor = UIColor.black.cgColor
-        playbackView.layer.shadowOpacity = 0.65
-        playbackView.layer.shadowRadius = 3.0
-        playbackView.layer.shadowOffset = CGSize(width: 0.0, height: -10.0)
         
         swipe = UISwipeGestureRecognizer(target: self, action: #selector(MainViewController.revealPlayback))
         swipe.direction = .up
-        if isOwner {
-            currView.addGestureRecognizer(swipe)
-            pauseButton.addTarget(self, action: #selector(togglePause), for: .touchUpInside)
-            nextButton.addTarget(self, action: #selector(skip), for: .touchUpInside)
-            backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
-        } else {
-            playbackView.removeFromSuperview()
-        }
+        
+        initializeCurrView()
+        initializePlaybackView()
         
         currView.frame.origin.y = tableView.frame.maxY + 8.0
         playbackView.frame.origin.y = view.bounds.height
@@ -143,20 +135,24 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         currTopConstr = constraints.first(where: { $0.identifier! == "current-top" })
         currBottomConstr = constraints.first(where: { $0.identifier! == "current-bottom" })
         
-        NotificationCenter.default.addObserver(self, selector: #selector(updateTime), name: Notification.Name(rawValue: "update-time"), object: nil)
-        if !isOwner {
-            NotificationCenter.default.addObserver(self, selector: #selector(pausedChanged), name: Notification.Name(rawValue: "paused-changed"), object: nil)
-        }
-    }
-    
-    @objc func updateSeg() {
-        isLibSeg = !isLibSeg
-        if isSearching { isSearching = !isSearching }
+        // *** Interact with the backend ***
+        
+        observeQueue()
+        fetchLibrary()
+        fetchCurr()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
+        // We only want to start the timer if we are the owner of the session
+        if !isOwner { return }
+        
+        SpotifyManager.shared.player.delegate = self
+        SpotifyManager.shared.player.playbackDelegate = self
+        
+        // If the app is entering the foreground after resigning active, then the timer will have been invalidated
+        // therefore, we want to start the timer again in that case.
         if let savedTimerState = UserDefaults.standard.object(forKey: "timerStarted") { timerStarted = savedTimerState as! Bool }
 
         if !timerStarted {
@@ -166,46 +162,34 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
+    // MARK: Timer Methods
+    
     @objc func decrementTimer() {
-        if !paused {
-            timeLeft -= 1
-            if isOwner { updateTime() }
-            arcLayer.animateArc()
-        }
+        if !paused { timeLeft -= 1 }
     }
     
-    @objc func updateTime() {
-        FirebaseManager.shared.setTimeLeft(timeLeft)
+    // MARK: current didSet
+    
+    func setCurrInDB(_ track: Track) {
+        guard isOwner else { return }
+        FirebaseManager.shared.setCurrent(track, timeLeft: timeLeft, paused: paused)
     }
     
-    // MARK: Toolbar UI Methods
-    
-    @objc func revealPlayback() {
-        playbackDisplayed = !playbackDisplayed
-        let multiplier: CGFloat = playbackDisplayed ? 1.0 : -1.0
+    func updateCurrDisplay(with track: Track) {
+        self.currTitleLabel.text = current.title
+        self.currArtistLabel.text = current.artist
+        self.saved = library.contains(where: { $0.trackID == track.trackID })
         
-        guard currTopConstr != nil && currBottomConstr != nil else {
-                print("could not find constraint")
-                return
-        }
-        
-        currTopConstr.constant -= self.playbackView.frame.height * multiplier
-        currBottomConstr.constant += self.playbackView.frame.height * multiplier
-        UIView.animate(withDuration: 0.25, animations: {
-            self.view.layoutIfNeeded()
-        }, completion: {_ in
-            self.swipe.direction = self.playbackDisplayed ? .down : .up
+        Utility.loadImage(from: current.albumImageURL, completion: { img in
+            DispatchQueue.main.async {
+                self.currImageView.image = img
+            }
         })
     }
     
     func toggleCurrView(hide: Bool) {
         let multiplier: CGFloat = hide ? -1.0 : 1.0
-        //currTopConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
         currBottomConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
-        
-        /*if currBottomConstr.constant == currTopConstr.constant {
-            currBottomConstr.constant = 0
-        }*/
         
         UIView.animate(withDuration: 0.35, animations: { self.view.layoutIfNeeded() })
     }
@@ -232,19 +216,48 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         toggleCurrView(hide: false)
     }
     
-    func updateCurrDisplay() {
-        guard current != nil else {
+    func initializeCurrView() {
+        currView.layer.masksToBounds = false
+        currView.layer.shadowColor = UIColor.black.cgColor
+        currView.layer.shadowOpacity = 0.65
+        currView.layer.shadowRadius = 3.0
+        currView.layer.shadowOffset = CGSize(width: 0.0, height: -10.0)
+    }
+    
+    @objc func revealPlayback() {
+        playbackDisplayed = !playbackDisplayed
+        let multiplier: CGFloat = playbackDisplayed ? 1.0 : -1.0
+        
+        guard currTopConstr != nil && currBottomConstr != nil else {
+            print("could not find constraint")
             return
         }
-        self.currTitleLabel.text = current.title
-        self.currArtistLabel.text = current.artist
-        //self.timeLeft = Int(current.duration/1000)
         
-        Utility.loadImage(from: current.albumImageURL, completion: { img in
-            DispatchQueue.main.async {
-                self.currImageView.image = img
-            }
+        currTopConstr.constant -= self.playbackView.frame.height * multiplier
+        currBottomConstr.constant += self.playbackView.frame.height * multiplier
+        
+        UIView.animate(withDuration: 0.25, animations: {
+            self.view.layoutIfNeeded()
+        }, completion: {_ in
+            self.swipe.direction = self.playbackDisplayed ? .down : .up
         })
+    }
+    
+    func initializePlaybackView() {
+        playbackView.layer.masksToBounds = false
+        playbackView.layer.shadowColor = UIColor.black.cgColor
+        playbackView.layer.shadowOpacity = 0.65
+        playbackView.layer.shadowRadius = 3.0
+        playbackView.layer.shadowOffset = CGSize(width: 0.0, height: -10.0)
+        
+        if isOwner {
+            currView.addGestureRecognizer(swipe)
+            pauseButton.addTarget(self, action: #selector(togglePause), for: .touchUpInside)
+            nextButton.addTarget(self, action: #selector(skip), for: .touchUpInside)
+            backButton.addTarget(self, action: #selector(back), for: .touchUpInside)
+        } else {
+            playbackView.removeFromSuperview()
+        }
     }
     
     @IBAction func toggleSave(_ sender: UIButton) {
@@ -252,6 +265,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             print("no current, stop saving")
             return
         }
+        
         if saved {
             guard let idx = self.library.index(where: { $0.trackID == current.trackID }) else { return }
             self.library.remove(at: idx)

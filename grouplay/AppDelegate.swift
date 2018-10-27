@@ -77,10 +77,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
-        
-        saveState()
-        invalidateTimers()
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "update-time"), object: nil, userInfo: nil)
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -89,7 +85,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         saveState()
         invalidateTimers()
-        FirebaseManager.shared.leave()
+        
+        SpotifyManager.shared.player.playbackDelegate = nil
+        SpotifyManager.shared.deactivateSession()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -106,12 +104,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard SessionStore.session != nil else { return }
         FirebaseManager.shared.enter()
         FirebaseManager.shared.refresh()
+        
+        SpotifyManager.shared.reactivateSession()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
+        
+        print("terminating")
+        FirebaseManager.shared.pause()
+        FirebaseManager.shared.leave()
     }
 
     // MARK: - Core Data stack

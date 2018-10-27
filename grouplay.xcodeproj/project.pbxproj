@@ -19,6 +19,9 @@
 		B70ADE0D20A4A2B700330A9C /* MainViewController+SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */; };
 		B70ADE0F20A4A30200330A9C /* MainViewController+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE0E20A4A30200330A9C /* MainViewController+API.swift */; };
 		B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */; };
+		B747DDED21344C2E001996D2 /* FirebaseManager+Current.swift in Sources */ = {isa = PBXBuildFile; fileRef = B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */; };
+		B747DDEF21344CA5001996D2 /* FirebaseManager+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */; };
+		B747DDF121344D4C001996D2 /* FirebaseManager+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B747DDF021344D4C001996D2 /* FirebaseManager+JSON.swift */; };
 		B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */; };
 		B769DB691FDC687300DDD4BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */; };
 		B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */; };
@@ -59,6 +62,9 @@
 		B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+SearchBar.swift"; sourceTree = "<group>"; };
 		B70ADE0E20A4A30200330A9C /* MainViewController+API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+API.swift"; sourceTree = "<group>"; };
 		B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLayer.swift; sourceTree = "<group>"; };
+		B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+Current.swift"; sourceTree = "<group>"; };
+		B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+Queue.swift"; sourceTree = "<group>"; };
+		B747DDF021344D4C001996D2 /* FirebaseManager+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+JSON.swift"; sourceTree = "<group>"; };
 		B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
 		B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
@@ -133,6 +139,17 @@
 			path = Main;
 			sourceTree = "<group>";
 		};
+		B747DDEB21344C1D001996D2 /* Firebase */ = {
+			isa = PBXGroup;
+			children = (
+				B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */,
+				B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */,
+				B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */,
+				B747DDF021344D4C001996D2 /* FirebaseManager+JSON.swift */,
+			);
+			path = Firebase;
+			sourceTree = "<group>";
+		};
 		B78A8DDE2017A02D006F936E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -162,7 +179,7 @@
 		B78A8DE02017A038006F936E /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */,
+				B747DDEB21344C1D001996D2 /* Firebase */,
 				B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */,
 				B70ADE0520A20E0600330A9C /* SessionStore.swift */,
 			);
@@ -360,11 +377,13 @@
 				B70ADE0F20A4A30200330A9C /* MainViewController+API.swift in Sources */,
 				B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */,
 				B70ADE02209F69BD00330A9C /* BridgeViewController.m in Sources */,
+				B747DDED21344C2E001996D2 /* FirebaseManager+Current.swift in Sources */,
 				B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */,
 				B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */,
 				B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */,
 				B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */,
 				B70ADE0920A4A16900330A9C /* MainViewController+Playback.swift in Sources */,
+				B747DDEF21344CA5001996D2 /* FirebaseManager+Queue.swift in Sources */,
 				B70ADE0D20A4A2B700330A9C /* MainViewController+SearchBar.swift in Sources */,
 				B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */,
 				B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */,
@@ -376,6 +395,7 @@
 				B70ADE0B20A4A25B00330A9C /* MainViewController+TableView.swift in Sources */,
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
 				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
+				B747DDF121344D4C001996D2 /* FirebaseManager+JSON.swift in Sources */,
 				B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */,
 				B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */,
 			);

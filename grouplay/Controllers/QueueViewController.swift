@@ -10,7 +10,6 @@ import UIKit
 
 class QueueViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    @IBOutlet weak var segControl: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
     
     var session: Session!
@@ -44,7 +43,7 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return segControl.selectedSegmentIndex == 0 ? session.approved.count : session.pending.count
+        return session.approved.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -53,7 +52,7 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
             return cell
         }
         
-        let track = segControl.selectedSegmentIndex == 0 ? session.approved[indexPath.row] : session.pending[indexPath.row]
+        let track = session.approved[indexPath.row]
         trackCell.track = track
         trackCell.titleLabel.text = track.title
         trackCell.artistLabel.text = track.artist
@@ -68,27 +67,12 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         var actions = [UITableViewRowAction]()
         let remove = UITableViewRowAction(style: .destructive, title: "Remove", handler: { _, indexPath in
-            let pending = self.segControl.selectedSegmentIndex == 1
-            FirebaseManager.shared.dequeue(pending ? self.session.pending[indexPath.row] : self.session.approved[indexPath.row], pending: pending)
-            if pending {
-                self.session.pending.remove(at: indexPath.row)
-            } else {
-                self.session.approved.remove(at: indexPath.row)
-            }
+            FirebaseManager.shared.dequeue(self.session.approved[indexPath.row], pending: false)
+            self.session.approved.remove(at: indexPath.row)
             self.tableView.reloadData()
         })
+        
         actions.append(remove)
-        if segControl.selectedSegmentIndex == 1 {
-            let approve = UITableViewRowAction(style: .normal, title: "Accept", handler: { _, indexPath in
-                let track = self.session.pending[indexPath.row]
-                FirebaseManager.shared.enqueue(track, pending: false)
-                FirebaseManager.shared.dequeue(track, pending: true)
-                self.session.pending.remove(at: indexPath.row)
-                self.session.approved.append(track)
-                self.tableView.reloadData()
-            })
-            actions.append(approve)
-        }
         return actions
     }
 

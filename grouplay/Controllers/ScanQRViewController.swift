@@ -17,7 +17,10 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        authorizeCamera()
+        
+        DispatchQueue.main.async {
+            self.authorizeCamera()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -53,9 +53,9 @@ extension MainViewController {
     }
     
     @objc func search(searchText: String) {
-        print("searching")
+        //print("searching")
 
-        guard searchText.count >= 2 else {
+        guard searchText.count >= 3 else {
             if searchText == "" {
                 self.searchBar.resignFirstResponder()
                 

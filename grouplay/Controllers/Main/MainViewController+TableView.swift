@@ -39,35 +39,21 @@ extension MainViewController {
         trackCell.track = track
         trackCell.imageURL = track.albumImageURL
         
+        trackCell.isOwner = isOwner
+        trackCell.queued = SessionStore.session?.approved.contains(where: { $0.trackID == track.trackID }) ?? false
+        
         return trackCell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if isOwner {
-            SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
-                
-                self.firstPlayOccurred = true
-                self.current = self.tracks[indexPath.row]
-                
-                self.timeLeft = Int(self.current.duration/1000)
-                self.arcLayer.timeLimit = self.timeLeft
-                
-                self.paused = false
-                
-                self.showCurrView()
-                self.updateCurrDisplay()
-            })
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        let action = UITableViewRowAction(style: .normal, title: "Enqueue", handler: { _, indexPath in
-            FirebaseManager.shared.enqueue(self.tracks[indexPath.row], pending: !self.isOwner)
-            if self.isOwner {
-                SessionStore.session!.approved.append(self.tracks[indexPath.row])
-            }
+        guard isOwner else { return }
+        
+        SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
+            
+            self.firstPlayOccurred = true
+            self.paused = false
+            self.current = self.tracks[indexPath.row]
         })
-        return [action]
     }
     
 }

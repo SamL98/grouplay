@@ -52,6 +52,7 @@ class SpotifyManager {
     // For information on how authentication is done, look at both OAuthSwift documentation and the Spotify API OAuth guide.
     
     var loginComp: (() -> Void)!
+    
     func login(onCompletion: @escaping () -> Void) {
         print("logging in to spotify")
 
@@ -157,6 +158,7 @@ class SpotifyManager {
             "grant_type":Constants.Components.grant_type,
             "refresh_token":refreshToken
             ], headers: ["Authorization":createRefreshTokenAuthorizationHeader()], success: { (response) in
+                
                 print("oauth refresh successful")
                 let access_token = self.parseJSON(data: response.data)
                 self.oauth.client.credential.oauthToken = access_token
@@ -344,13 +346,21 @@ class SpotifyManager {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers)
             do {
                 try AVAudioSession.sharedInstance().setActive(true)
-                
             } catch let error as NSError {
                 print(error.localizedDescription)
             }
         } catch let error as NSError {
             print(error.localizedDescription)
         }
+    }
+    
+    func reactivateSession() {
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers)
+        try? AVAudioSession.sharedInstance().setActive(true)
+    }
+    
+    func deactivateSession() {
+        try? AVAudioSession.sharedInstance().setActive(false)
     }
     
     // MARK: JSON Parsing

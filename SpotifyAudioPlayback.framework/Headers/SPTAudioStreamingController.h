@@ -255,6 +255,8 @@ typedef NS_ENUM(NSUInteger, SPTRepeatMode) {
 /** Returns the current streaming bitrate the receiver is using. */
 @property (atomic, readonly) SPTBitrate targetBitrate;
 
+@property (atomic) SPTCoreAudioController *audioController;
+
 @end
 
 

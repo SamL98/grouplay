@@ -17,16 +17,8 @@ extension MainViewController {
         })
     }
     
-    @objc func pausedChanged(info: [String:AnyObject]) {
-        guard SessionStore.session != nil else { return }
-        guard let pausedVal = info["paused"] as? Bool else { return }
-        if pausedVal != paused { togglePause() }
-    }
-    
     func fetchLibrary() {
-        /*guard offsetCount <= 10 else {
-            return
-        }*/
+        //guard offsetCount <= 10 else { return }
         SpotifyManager.shared.fetchLibrary(extraParameters: ["offset": (50 * offsetCount) as AnyObject], onCompletion: { (optTracksArr, error) in
             guard error == nil else {
                 print("fetch library \(error!)")
@@ -59,7 +51,6 @@ extension MainViewController {
     }
     
     func fetchCurr() {
-        if isOwner { return }
         FirebaseManager.shared.fetchCurrent { track, time, paused, err in
             self.parseCurr(track: track, time: time, paused: paused, err: err)
         }
@@ -78,13 +69,20 @@ extension MainViewController {
             return
         }
         
-        self.current = track!
-        self.paused = paused!
+        var pausedVal = paused == nil ? true : paused!
+        if self.current == nil && pausedVal == false {
+            pausedVal = true
+        }
         
         DispatchQueue.main.async {
-            self.showCurrView()
-            self.updateCurrDisplay()
-            self.timeLeft = time == nil ? track!.duration : time!
+            self.current = track!
+            self.paused = pausedVal
+            
+            if time != nil {
+                self.timeLeft = time!
+            } else if track != nil {
+                self.timeLeft = track!.duration
+            }
         }
     }
     

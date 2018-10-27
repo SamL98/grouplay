@@ -13,6 +13,7 @@ class TrackTableViewCell: UITableViewCell {
     @IBOutlet weak var iconView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
+    @IBOutlet weak var queueButton: UIButton!
     
     var track: Track!
     var imageURL: URL? {
@@ -24,6 +25,14 @@ class TrackTableViewCell: UITableViewCell {
             if let url = imageURL {
                 loadImage(from: url)
             }
+        }
+    }
+    
+    var isOwner = false
+    var queued = false {
+        didSet {
+            let title = queued ? "E" : "Q"
+            queueButton.setTitle(title, for: .normal)
         }
     }
     
@@ -45,11 +54,21 @@ class TrackTableViewCell: UITableViewCell {
                 print("unable to create image from data")
                 return
             }
+            
             self.track.image = image
             DispatchQueue.main.async {
                 self.iconView.image = image
             }
         }).resume()
+    }
+    
+    @IBAction func enqueue(sender: UIButton) {
+        if !queued { queued = true }
+        
+        FirebaseManager.shared.enqueue(track, pending: !self.isOwner)
+        if isOwner {
+            SessionStore.session!.approved.append(track)
+        }
     }
 
 }
