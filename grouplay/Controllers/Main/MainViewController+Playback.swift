@@ -78,6 +78,7 @@ extension MainViewController {
         
         SpotifyManager.shared.player.setIsPlaying(paused, callback: nil)
         paused = !paused
+        FirebaseManager.shared.setPaused(paused: paused)
     }
     
     // Set the player to the duration of the current song. Then didStopPlayingTrack will be called and the next song will be played.

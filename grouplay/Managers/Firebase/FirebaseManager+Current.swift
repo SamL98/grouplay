@@ -80,6 +80,29 @@ extension FirebaseManager {
             "duration": track.duration,
             "timestamp": Date.now()
             ])
+        
+        SessionStore.session?.current = (track, timeLeft, ts, !paused)
     }
     
+    func observePaused(sess: Session, eventOccurred: @escaping (Bool) -> Void) {
+        guard sessRef != nil else {
+            print("sess ref is nil")
+            eventOccurred(false)
+            return
+        }
+        
+        sessRef!.child("paused").observe(.value, with: { snap in
+            guard let paused = snap.value as? Bool else {
+                print("Could not parse value of paused from snapshot: \(String(describing: snap.value))")
+                return
+            }
+            
+            eventOccurred(paused)
+            return
+        })
+    }
+    
+    func setPaused(paused: Bool) {
+        sessRef?.child("paused").setValue(paused)
+    }
 }
