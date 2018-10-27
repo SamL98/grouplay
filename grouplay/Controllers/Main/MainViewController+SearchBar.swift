@@ -49,17 +49,17 @@ extension MainViewController {
     }
 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MainViewController.search(searchText:)), object: nil)
-        perform(#selector(MainViewController.search(searchText:)), with: searchText, afterDelay: 0.75)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MainViewController.searchTextUpdated(searchText:)), object: nil)
+        perform(#selector(MainViewController.searchTextUpdated(searchText:)), with: searchText, afterDelay: 0.75)
     }
     
-    @objc func search(searchText: String) {
+    @objc func searchTextUpdated(searchText: String) {
         self.segControlSearched = false
         self.searchInputText = searchText
-        searchHelper(searchText: self.searchInputText)
+        search(searchText: self.searchInputText)
     }
 
-    func searchHelper(searchText: String) {
+    func search(searchText: String) {
         //guard searchText.count >= 3 else {
             
             

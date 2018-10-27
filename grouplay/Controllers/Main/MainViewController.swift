@@ -288,7 +288,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     @IBAction func segControlSwitch(_ sender: Any) {
         if self.segControl.selectedSegmentIndex == 0 {
             if !segControlSearched {
-                searchHelper(searchText: self.searchInputText)
+                search(searchText: self.searchInputText)
                 segControlSearched = true
             }
             self.tracks = self.filteredLibrary
@@ -298,7 +298,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             }
         } else {
             if !segControlSearched {
-                searchHelper(searchText: self.searchInputText)
+                search(searchText: self.searchInputText)
                 segControlSearched = true
             }
             self.tracks = self.searched
