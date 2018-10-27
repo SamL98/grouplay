@@ -26,7 +26,8 @@ class FirebaseManager {
             return
         }
         dbRef.child("sessions").child(code).setValue([
-            "owner": uid as AnyObject
+            "owner": uid as AnyObject,
+            "paused": true as AnyObject
         ], withCompletionBlock: { (err, _) in
             if err == nil {
                 self.sessRef = Database.database().reference().child("sessions").child(code)

@@ -86,4 +86,10 @@ extension MainViewController {
         }
     }
     
+    func observePaused() {
+        guard let sess = SessionStore.session else { return }
+        FirebaseManager.shared.observePaused(sess: sess, eventOccurred: { paused in
+            self.paused = paused
+        })
+    }
 }

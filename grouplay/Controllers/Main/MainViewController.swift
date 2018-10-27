@@ -140,6 +140,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         observeQueue()
         fetchLibrary()
         fetchCurr()
+        observePaused()
     }
     
     override func viewDidAppear(_ animated: Bool) {

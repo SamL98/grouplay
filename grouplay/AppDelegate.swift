@@ -114,7 +114,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.saveContext()
         
         print("terminating")
-        FirebaseManager.shared.pause()
+        FirebaseManager.shared.setPaused(paused: true)
         FirebaseManager.shared.leave()
     }
 
