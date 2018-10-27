@@ -40,12 +40,7 @@ extension MainViewController {
     func hideNoMatchLabel() {
         view.viewWithTag(69)?.removeFromSuperview()
     }
-    
-    func displayOrHideMatchLabel() {
-        if self.searched.count == 0 { showNoMatchLabel() }
-        else { hideNoMatchLabel() }
-    }
-    
+
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MainViewController.search(searchText:)), object: nil)
         perform(#selector(MainViewController.search(searchText:)), with: searchText, afterDelay: 0.75)
@@ -56,8 +51,6 @@ extension MainViewController {
         
         guard searchText.count >= 3 else {
             if searchText == "" {
-                self.searchBar.resignFirstResponder()
-                
                 if segControl.selectedSegmentIndex == 0 {
                     tracks = library
                 }
@@ -110,6 +103,8 @@ extension MainViewController {
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        print("HERE")
+        
         self.searchBar.resignFirstResponder()
         self.searchBar.endEditing(true)
         
