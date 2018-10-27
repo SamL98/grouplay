@@ -28,6 +28,13 @@ extension MainViewController {
         }
     }
     
+    func checkForShowNoMatchLabel(trackArray: [Track]) {
+        hideNoMatchLabel()
+        if trackArray.count == 0 {
+            showNoMatchLabel()
+        }
+    }
+    
     func showNoMatchLabel() {
         let labelWidth: CGFloat = view.frame.width/3*2
         let label = UILabel(frame: CGRect(x: view.frame.midX-labelWidth/2, y: view.frame.midY-50.0, width: labelWidth, height: 100.0))
@@ -42,33 +49,43 @@ extension MainViewController {
     }
 
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MainViewController.search(searchText:)), object: nil)
-        perform(#selector(MainViewController.search(searchText:)), with: searchText, afterDelay: 0.75)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(MainViewController.searchTextUpdated(searchText:)), object: nil)
+        perform(#selector(MainViewController.searchTextUpdated(searchText:)), with: searchText, afterDelay: 0.75)
     }
     
-    @objc func search(searchText: String) {
-        hideNoMatchLabel()
-        
-        guard searchText.count >= 3 else {
-            if searchText == "" {
-                if segControl.selectedSegmentIndex == 0 {
-                    tracks = library
-                }
-                
-                DispatchQueue.main.async {
-                    if self.searched.count == 0 { self.showNoMatchLabel() }
-                    self.tableView.reloadData()
-                }
+    @objc func searchTextUpdated(searchText: String) {
+        self.segControlSearched = false
+        self.searchInputText = searchText
+        search(searchText: self.searchInputText)
+    }
+
+    func search(searchText: String) {
+        //guard searchText.count >= 3 else {
+            
+            
+        if searchText == "" {
+            if segControl.selectedSegmentIndex == 0 {
+                tracks = library
+            }
+            
+            DispatchQueue.main.async {
+                //if self.searched.count == 0 { self.showNoMatchLabel() }
+                self.tableView.reloadData()
+            }
+            if segControl.selectedSegmentIndex == 0 {
+                self.filteredLibrary = self.library
             }
             return
         }
+
         
         if segControl.selectedSegmentIndex == 0 {
-            self.searched = filterTracks(text: searchText, tracksToFilter: library)
-            self.tracks = self.searched
+            self.filteredLibrary = filterTracks(text: searchText, tracksToFilter: library)
+            self.tracks = self.filteredLibrary
             
             DispatchQueue.main.async {
-                if self.searched.count == 0 { self.showNoMatchLabel() }
+                self.checkForShowNoMatchLabel(trackArray: self.filteredLibrary)
+                //if self.searched.count == 0 { self.showNoMatchLabel() }
                 self.tableView.reloadData()
             }
         } else {
@@ -76,7 +93,8 @@ extension MainViewController {
                 self.tracks = self.searched
                 
                 DispatchQueue.main.async {
-                    if self.searched.count == 0 { self.showNoMatchLabel() }
+                    self.checkForShowNoMatchLabel(trackArray: self.tracks)
+                    //if self.searched.count == 0 { self.showNoMatchLabel() }
                     self.tableView.reloadData()
                 }
             }
