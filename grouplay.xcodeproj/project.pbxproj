@@ -244,7 +244,6 @@
 				B7BB98EE1FD9B0D2007BDB0B /* Frameworks */,
 				B7BB98EF1FD9B0D2007BDB0B /* Resources */,
 				9FC5FFA3051704966D0B4288 /* [CP] Embed Pods Frameworks */,
-				B89416600CFE6AF72EFB608B /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -349,21 +348,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-grouplay/Pods-grouplay-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B89416600CFE6AF72EFB608B /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-grouplay/Pods-grouplay-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

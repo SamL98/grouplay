@@ -8,10 +8,10 @@ PODS:
   - FirebaseAnalytics (4.0.4):
     - FirebaseCore (~> 4.0)
     - FirebaseInstanceID (~> 2.0)
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
     - nanopb (~> 0.3)
   - FirebaseCore (4.0.9):
-    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+    - "GoogleToolboxForMac/NSData+zlib (~> 2.1)"
     - nanopb (~> 0.3)
   - FirebaseDatabase (4.1.1):
     - FirebaseAnalytics (~> 4.0)
@@ -19,7 +19,7 @@ PODS:
     - leveldb-library (~> 1.18)
   - FirebaseInstanceID (2.0.5)
   - GoogleToolboxForMac/Defines (2.1.3)
-  - GoogleToolboxForMac/NSData+zlib (2.1.3):
+  - "GoogleToolboxForMac/NSData+zlib (2.1.3)":
     - GoogleToolboxForMac/Defines (= 2.1.3)
   - KeychainSwift (9.0.2)
   - leveldb-library (1.18.3)
@@ -38,6 +38,20 @@ DEPENDENCIES:
   - OAuthSwift
   - QRCode
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseCore
+    - FirebaseDatabase
+    - FirebaseInstanceID
+    - GoogleToolboxForMac
+    - KeychainSwift
+    - leveldb-library
+    - nanopb
+    - OAuthSwift
+    - QRCode
+
 SPEC CHECKSUMS:
   Firebase: 3e92884a63e8f76d107c43a67d2ab9071e1eda10
   FirebaseAnalytics: 722b53c7b32bfc7806b06e0093a2f5180d4f2c5a
@@ -53,4 +67,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c980ea90e38c570e0e1832fab0592fee7b9b0400
 
-COCOAPODS: 1.3.1
+COCOAPODS: 1.5.3
