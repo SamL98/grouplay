@@ -1,0 +1,6 @@
+framework module Pods_grouplay {
+  umbrella header "Pods-grouplay-umbrella.h"
+
+  export *
+  module * { export * }
+}
