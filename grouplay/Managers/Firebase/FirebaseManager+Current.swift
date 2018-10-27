@@ -72,7 +72,6 @@ extension FirebaseManager {
     
     // Set the current track in the database. Only called if the session is owned by the current user.
     func setCurrent(_ track: Track) {
-        print(track.title)
         sessRef?.child("current").setValue([
             "id": track.trackID,
             "title": track.title,

@@ -71,6 +71,9 @@ extension MainViewController {
         if !firstPlayOccurred && paused {
             firstPlayOccurred = true
             SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + current.trackID, startingWith: 0, startingWithPosition: Double(current.duration)/1000.0 - Double(timeLeft), callback: nil)
+            
+            paused = !paused
+            return
         }
         
         SpotifyManager.shared.player.setIsPlaying(paused, callback: nil)
