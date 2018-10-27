@@ -13,14 +13,14 @@ import FirebaseDatabase
 extension FirebaseManager {
     
     // Observe the realtime current track in the database. Only called if the session is not owned by the current user.
-    func fetchCurrent(isOwner: Bool, completion: @escaping (Track?, Int?, Bool?, NSError?) -> Void) {
+    func fetchCurrent(isOwner: Bool, completion: @escaping (Track?, NSError?) -> Void) {
         if sessRef == nil {
             print("sess ref nil")
-            completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+            completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
             return
         }
         
-        var comp: (DataSnapshot) -> Void = { snap in
+        let comp: (DataSnapshot) -> Void = { snap in
             guard let val = snap.value as? [String:AnyObject] else {
                 return
             }
@@ -30,9 +30,10 @@ extension FirebaseManager {
                 let title = val["title"] as? String,
                 let artist = val["artist"] as? String,
                 let imgUrl = val["imageURL"] as? String,
-                let duration = val["duration"] as? Int else {
+                let duration = val["duration"] as? Int,
+                let timestamp = val["timestamp"] as? UInt64 else {
                     
-                    //completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+                    completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
                     return
             }
             
@@ -48,9 +49,8 @@ extension FirebaseManager {
                               preview: nil,
                               duration: duration,
                               timestamp: timestamp)
-            
-            SessionStore.session?.current = (track, timeLeft, timestamp, !paused)
-            completion(track, timeLeft, paused,  nil)
+        
+            completion(track,  nil)
         }
         
         if isOwner {
@@ -58,35 +58,29 @@ extension FirebaseManager {
                                                         with: comp,
                                                         withCancel: { err in
                                                             print("could not fetch current (firebase): \(err)")
-                                                            completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
+                                                            completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
             })
         } else {
             sessRef?.child("current").observe(.value,
                                                 with: comp,
                                                 withCancel: { err in
                                                     print("could not fetch current (firebase): \(err)")
-                                                    completion(nil, nil, nil, NSError(domain: "current-fetch", code: 4324, userInfo: nil))
+                                                    completion(nil, NSError(domain: "current-fetch", code: 4324, userInfo: nil))
             })
         }
     }
     
     // Set the current track in the database. Only called if the session is owned by the current user.
-    func setCurrent(_ track: Track, timeLeft: Int, paused: Bool) {
+    func setCurrent(_ track: Track) {
+        print(track.title)
         sessRef?.child("current").setValue([
             "id": track.trackID,
             "title": track.title,
             "artist": track.artist,
             "imageURL": "\(track.albumImageURL)",
-            "duration": track.duration
+            "duration": track.duration,
+            "timestamp": Date.now()
             ])
-    }
-    
-    func pause() {
-        sessRef?.child("paused").setValue(true)
-    }
-    
-    func play() {
-        sessRef?.child("paused").setValue(false)
     }
     
 }

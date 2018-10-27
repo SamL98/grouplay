@@ -28,8 +28,6 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
             canEdit = session.owner == uid
         }
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(QueueViewController.refresh))
-        
         NotificationCenter.default.addObserver(self, selector: #selector(queueChanged), name: Notification.Name(rawValue: "queue-changed"), object: nil)
     }
     
@@ -78,17 +76,5 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
 
     @IBAction func toggleType(_ sender: Any) {
         tableView.reloadData()
-    }
-    
-    @objc func refresh() {
-        FirebaseManager.shared.fetchQueue(sess: session) { err in
-            if err != nil {
-                print(err!)
-                return
-            }
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        }
     }
 }
