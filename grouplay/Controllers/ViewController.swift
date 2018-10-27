@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     var session: SPTSession!
+    var shdSegue = false
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
@@ -23,10 +24,17 @@ class ViewController: UIViewController {
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        if shdSegue {
+            performSegue(withIdentifier: "to launch", sender: nil)
+        }
+    }
+    
     @objc func finishLogin() {
+        print("finish login")
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name("login"), object: nil)
         DispatchQueue.main.async {
-            self.performSegue(withIdentifier: "to launch", sender: nil)
+            self.shdSegue = true
         }
     }
 
