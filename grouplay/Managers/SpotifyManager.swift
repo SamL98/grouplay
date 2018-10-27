@@ -300,7 +300,7 @@ class SpotifyManager {
                     timeLeft -= Int((Date.now() - timestamp!/1000))
                 }
                 
-                FirebaseManager.shared.setCurrent(track, timeLeft: timeLeft/1000, paused: true)
+                FirebaseManager.shared.setCurrent(track)
                 completion(track, timeLeft == 0 ? nil : timeLeft/1000, nil)
             } else {
                 completion(nil, nil, NSError(domain: "current-fetch", code: 421, userInfo: nil))

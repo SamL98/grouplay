@@ -49,7 +49,6 @@ extension MainViewController {
         guard isOwner else { return }
         
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
-            
             self.firstPlayOccurred = true
             self.paused = false
             self.current = self.tracks[indexPath.row]
