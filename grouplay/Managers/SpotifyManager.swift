@@ -355,12 +355,24 @@ class SpotifyManager {
     }
     
     func reactivateSession() {
-        try? AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers)
-        try? AVAudioSession.sharedInstance().setActive(true)
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: AVAudioSessionCategoryOptions.mixWithOthers)
+            do {
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
     }
     
     func deactivateSession() {
-        try? AVAudioSession.sharedInstance().setActive(false)
+        do {
+            try AVAudioSession.sharedInstance().setActive(false)
+        } catch let error as NSError {
+            print("deactivate error: \(error)")
+        }
     }
     
     // MARK: JSON Parsing

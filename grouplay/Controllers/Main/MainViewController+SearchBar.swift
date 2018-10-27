@@ -98,19 +98,15 @@ extension MainViewController {
 
         DispatchQueue.main.async {
             self.tableView.reloadData()
-            //self.isSearching = false
         }
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        print("HERE")
-        
         self.searchBar.resignFirstResponder()
         self.searchBar.endEditing(true)
         
         DispatchQueue.main.async {
             self.tableView.reloadData()
-            //self.isSearching = false
         }
     }
     

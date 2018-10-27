@@ -83,11 +83,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
         
-        saveState()
-        invalidateTimers()
+        //saveState()
+        //invalidateTimers()
         
-        SpotifyManager.shared.player.playbackDelegate = nil
-        SpotifyManager.shared.deactivateSession()
+        //SpotifyManager.shared.player.playbackDelegate = nil
+        //SpotifyManager.shared.deactivateSession()
+        
+        print("entering background")
+        FirebaseManager.shared.setPaused(paused: true)
+        FirebaseManager.shared.leave()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -104,7 +108,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         guard SessionStore.session != nil else { return }
         FirebaseManager.shared.enter()
         
-        SpotifyManager.shared.reactivateSession()
+        //SpotifyManager.shared.reactivateSession()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

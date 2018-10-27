@@ -90,9 +90,14 @@ class FirebaseManager {
     
     // Remove the current user from the current session
     func leave() {
-        guard let uid = UserDefaults.standard.string(forKey: "uid") else { return }
+        guard let uid = UserDefaults.standard.string(forKey: "uid") else {
+            print("No uid found")
+            return
+        }
         
+        print(SessionStore.session?.members)
         let members = (SessionStore.session?.members.removeValue(forKey: uid) as? [String:[String:AnyObject]]) ?? [String:[String:AnyObject]]()
+        print(members)
         sessRef?.child("members").setValue(members as [String:AnyObject])
         
         if let session = SessionStore.session, uid == session.owner {

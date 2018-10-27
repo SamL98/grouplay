@@ -10,6 +10,14 @@ import UIKit
 
 extension MainViewController {
     
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
+        /*if isPlaying {
+            SpotifyManager.shared.reactivateSession()
+        } else {
+            SpotifyManager.shared.deactivateSession()
+        }*/
+    }
+    
     // Delegate method called when audio streaming has been authenticated. Just record this in UserDefaults
     func audioStreamingDidLogin(_ audioStreaming: SPTAudioStreamingController!) {
         UserDefaults.standard.set(true, forKey: "stream-logged-in")

@@ -111,9 +111,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //print(SpotifyManager.shared.player)
+        navigationController?.navigationBar.topItem?.title = SessionStore.session?.id ?? ""
         
-        //isOwner = isOwner || (UserDefaults.standard.string(forKey: "user_id") ?? "") == "lerner98"
         paused = true
         
         searchBar.delegate = self
