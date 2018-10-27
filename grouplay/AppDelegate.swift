@@ -103,7 +103,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         guard SessionStore.session != nil else { return }
         FirebaseManager.shared.enter()
-        FirebaseManager.shared.refresh()
         
         SpotifyManager.shared.reactivateSession()
     }

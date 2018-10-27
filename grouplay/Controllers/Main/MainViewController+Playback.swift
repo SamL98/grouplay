@@ -20,7 +20,7 @@ extension MainViewController {
         guard let nextUp = SessionStore.session!.approved.first(where: { "spotify:track:" + $0.trackID == trackUri }) else {
             print("could not find track in session")
             if current != nil {
-                FirebaseManager.shared.setCurrent(current, timeLeft: timeLeft, paused: paused)
+                FirebaseManager.shared.setCurrent(current)
             }
             return
         }

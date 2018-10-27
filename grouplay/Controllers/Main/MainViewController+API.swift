@@ -31,13 +31,6 @@ extension MainViewController {
 
             self.library.append(contentsOf: tracksArr)
             
-            // Set the current track to itself so that its didSet will be triggered
-            // and saved will be updated.
-            //
-            // This is needed because the save will initially be set when the library array is empty.
-            let curr = self.current
-            self.current = curr
-            
             self.offsetCount += 1
             self.fetchLibrary()
             
@@ -50,13 +43,14 @@ extension MainViewController {
         })
     }
     
+    // Fetch curr will call once is isOwner, listen otherwise
     func fetchCurr() {
-        FirebaseManager.shared.fetchCurrent { track, time, paused, err in
-            self.parseCurr(track: track, time: time, paused: paused, err: err)
+        FirebaseManager.shared.fetchCurrent(isOwner: isOwner) { track, err in
+            self.parseCurr(track: track, err: err)
         }
     }
     
-    func parseCurr(track: Track?, time: Int?, paused: Bool?, err: NSError?) {
+    func parseCurr(track: Track?, err: NSError?) {
         guard err == nil else {
             print("parsing curr: \(err!)")
             self.currViewDisplayed = true
@@ -64,25 +58,13 @@ extension MainViewController {
             return
         }
         
-        guard track != nil && paused != nil else {
+        guard track != nil else {
             self.hideCurrView()
             return
         }
         
-        var pausedVal = paused == nil ? true : paused!
-        if self.current == nil && pausedVal == false {
-            pausedVal = true
-        }
-        
         DispatchQueue.main.async {
             self.current = track!
-            self.paused = pausedVal
-            
-            if time != nil {
-                self.timeLeft = time!
-            } else if track != nil {
-                self.timeLeft = track!.duration
-            }
         }
     }
     

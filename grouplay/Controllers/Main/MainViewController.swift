@@ -113,7 +113,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
         //print(SpotifyManager.shared.player)
         
-        isOwner = isOwner || (UserDefaults.standard.string(forKey: "user_id") ?? "") == "lerner98"
+        //isOwner = isOwner || (UserDefaults.standard.string(forKey: "user_id") ?? "") == "lerner98"
         paused = true
         
         searchBar.delegate = self
@@ -173,7 +173,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func setCurrInDB(_ track: Track) {
         guard isOwner else { return }
-        FirebaseManager.shared.setCurrent(track, timeLeft: timeLeft, paused: paused)
+        FirebaseManager.shared.setCurrent(track)
     }
     
     func updateCurrDisplay(with track: Track) {
