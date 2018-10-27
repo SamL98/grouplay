@@ -278,6 +278,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     @IBAction func goBack(_ sender: UIBarButtonItem) {
+        FirebaseManager.shared.leave()
         dismiss(animated: true, completion: nil)
     }
     

@@ -95,9 +95,7 @@ class FirebaseManager {
             return
         }
         
-        print(SessionStore.session?.members)
         let members = (SessionStore.session?.members.removeValue(forKey: uid) as? [String:[String:AnyObject]]) ?? [String:[String:AnyObject]]()
-        print(members)
         sessRef?.child("members").setValue(members as [String:AnyObject])
         
         if let session = SessionStore.session, uid == session.owner {
