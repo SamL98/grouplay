@@ -30,6 +30,7 @@ class ViewController: UIViewController {
     }
 
     @IBAction func login(_ sender: UIButton) {
+        SpotifyManager.shared.setAuthHandler(for: self)
         SpotifyManager.shared.login {
             DispatchQueue.main.async {
                 self.performSegue(withIdentifier: "to launch", sender: nil)

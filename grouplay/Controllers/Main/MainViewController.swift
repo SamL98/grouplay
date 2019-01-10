@@ -41,10 +41,14 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // 1. update the current view display with the track info (includes saved button)
     // 2. set the track as the current in the database if the current user is the owner
     // 3. show the current view
-    var current: Track! {
+    var current: QueuedTrack! {
         didSet {
             guard current != nil else { return }
             
+            if let oldTrack = oldValue, let sess = SessionStore.session {
+                FirebaseManager.shared.archiveTrack(oldTrack, to: sess)
+            }
+
             updateCurrDisplay(with: current)
             setCurrInDB(current)
             showCurrView()
@@ -54,7 +58,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     var tracks = [Track]() // the tracks to be displayed in the tableview
-    var prev = [Track]() // the previous tracks played so that the owner can go to the previous song indefinitely
+    var prev = [QueuedTrack]() // the previous tracks played so that the owner can go to the previous song indefinitely
     var library = [Track]() // the current user's library
     var searched = [Track]() // the result of the current search if searching
     var filteredLibrary = [Track]()
@@ -110,6 +114,8 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             saveButton.setImage(img!, for: .normal)
         }
     }
+    
+    var scrolling = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -173,7 +179,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // MARK: current didSet
     
-    func setCurrInDB(_ track: Track) {
+    func setCurrInDB(_ track: QueuedTrack) {
         guard isOwner else { return }
         FirebaseManager.shared.setCurrent(track)
     }

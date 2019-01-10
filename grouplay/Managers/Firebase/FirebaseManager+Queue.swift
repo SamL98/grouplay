@@ -14,6 +14,10 @@ extension FirebaseManager {
     
     // MARK: Setters
     
+    func archiveTrack(_ track: Track, to session: Session) {
+        dbRef.child("history").child(session.id).child("\(Date.now())").setValue(track.trackID)
+    }
+    
     // Enqueue the given track in the database. If the current user is the owner, it is automatically set to approved. Otherwise, it is pending.
     func enqueue(_ track: Track, pending: Bool) {
         insert(track, pending: false, before: Date.now())
@@ -33,7 +37,8 @@ extension FirebaseManager {
             "artist": track.artist,
             "imageURL": "\(track.albumImageURL)",
             "duration": track.duration,
-            "timestamp": before-1
+            "timestamp": before-1,
+            "queuer": UserDefaults.standard.string(forKey: "user_id") ?? "username"
             ])
     }
     
@@ -59,7 +64,7 @@ extension FirebaseManager {
             }
             
             let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
-            var queue = path == "approved" ? sess.approved : sess.pending
+            var queue = sess.queue
             guard newTrack.trackID != "" && !queue.contains(where: { $0.trackID == newTrack.trackID }) else {
                 //print("new track is nil or is already in approved queue")
                 eventOccurred(false)
@@ -68,9 +73,7 @@ extension FirebaseManager {
             
             queue.append(newTrack)
             if path == "approved" {
-                SessionStore.session?.approved.append(newTrack)
-            } else {
-                SessionStore.session?.pending.append(newTrack)
+                SessionStore.session?.queue.append(newTrack)
             }
             eventOccurred(true)
         })
@@ -85,7 +88,7 @@ extension FirebaseManager {
             }
             
             let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
-            var queue = path == "approved" ? sess.approved : sess.pending
+            var queue = sess.queue
             guard newTrack.trackID != "" && queue.contains(where: { $0.trackID == newTrack.trackID }) else {
                 //print("new track is nil or is already in approved queue")
                 eventOccurred(false)

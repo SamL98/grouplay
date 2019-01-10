@@ -30,9 +30,11 @@
 		B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78A8DE42017E314006F936E /* QueueViewController.swift */; };
 		B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */; };
 		B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */; };
-		B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C01FD9BB3D00A00497 /* WebView.swift */; };
 		B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C21FDAF0E600A00497 /* MainViewController.swift */; };
 		B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */; };
+		B7A3F0C321E6B5E000AA3BA4 /* QueueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A3F0C221E6B5E000AA3BA4 /* QueueTableViewCell.swift */; };
+		B7A3F0C521E6BF7F00AA3BA4 /* QueuedTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A3F0C421E6BF7F00AA3BA4 /* QueuedTrack.swift */; };
+		B7A3F0C721E6C9C800AA3BA4 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A3F0C621E6C9C800AA3BA4 /* InfoViewController.swift */; };
 		B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */; };
 		B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */; };
 		B7BB98FA1FD9B0D2007BDB0B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7BB98F81FD9B0D2007BDB0B /* Main.storyboard */; };
@@ -73,9 +75,11 @@
 		B78A8DE42017E314006F936E /* QueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewController.swift; sourceTree = "<group>"; };
 		B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowQRViewController.swift; sourceTree = "<group>"; };
 		B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRViewController.swift; sourceTree = "<group>"; };
-		B79FA7C01FD9BB3D00A00497 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		B79FA7C21FDAF0E600A00497 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackTableViewCell.swift; sourceTree = "<group>"; };
+		B7A3F0C221E6B5E000AA3BA4 /* QueueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueTableViewCell.swift; sourceTree = "<group>"; };
+		B7A3F0C421E6BF7F00AA3BA4 /* QueuedTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueuedTrack.swift; sourceTree = "<group>"; };
+		B7A3F0C621E6C9C800AA3BA4 /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
 		B7BB98F11FD9B0D2007BDB0B /* grouplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = grouplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -162,6 +166,7 @@
 				B70ADDFF209F69BD00330A9C /* grouplay-Bridging-Header.h */,
 				B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */,
 				B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */,
+				B7A3F0C621E6C9C800AA3BA4 /* InfoViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -170,7 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */,
-				B79FA7C01FD9BB3D00A00497 /* WebView.swift */,
+				B7A3F0C221E6B5E000AA3BA4 /* QueueTableViewCell.swift */,
 				B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */,
 			);
 			path = Views;
@@ -190,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				B7BB990B1FD9B205007BDB0B /* Track.swift */,
+				B7A3F0C421E6BF7F00AA3BA4 /* QueuedTrack.swift */,
 				B769DB6E1FDC99B300DDD4BE /* Session.swift */,
 			);
 			path = Models;
@@ -370,18 +376,20 @@
 				B747DDEF21344CA5001996D2 /* FirebaseManager+Queue.swift in Sources */,
 				B70ADE0D20A4A2B700330A9C /* MainViewController+SearchBar.swift in Sources */,
 				B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */,
+				B7A3F0C721E6C9C800AA3BA4 /* InfoViewController.swift in Sources */,
 				B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */,
 				B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */,
 				B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */,
-				B79FA7C11FD9BB3D00A00497 /* WebView.swift in Sources */,
 				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
 				B70ADE0620A20E0600330A9C /* SessionStore.swift in Sources */,
 				B70ADE0B20A4A25B00330A9C /* MainViewController+TableView.swift in Sources */,
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
+				B7A3F0C521E6BF7F00AA3BA4 /* QueuedTrack.swift in Sources */,
 				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
 				B747DDF121344D4C001996D2 /* FirebaseManager+JSON.swift in Sources */,
 				B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */,
 				B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */,
+				B7A3F0C321E6B5E000AA3BA4 /* QueueTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,7 +529,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YDG22WTMXW;
+				DEVELOPMENT_TEAM = 5HEWYRTN5L;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -529,7 +537,7 @@
 				INFOPLIST_FILE = grouplay/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = LernerApps.grouplay;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SLernerApps.GrouPlay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "grouplay/Controllers/grouplay-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -545,7 +553,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YDG22WTMXW;
+				DEVELOPMENT_TEAM = 5HEWYRTN5L;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -553,7 +561,7 @@
 				INFOPLIST_FILE = grouplay/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = LernerApps.grouplay;
+				PRODUCT_BUNDLE_IDENTIFIER = com.SLernerApps.GrouPlay;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "grouplay/Controllers/grouplay-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;

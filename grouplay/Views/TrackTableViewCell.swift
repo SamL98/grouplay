@@ -16,28 +16,50 @@ class TrackTableViewCell: UITableViewCell {
     @IBOutlet weak var queueButton: UIButton!
     
     var track: Track!
+    
+    var dontDownload = false {
+        didSet {
+            if dontDownload == true {
+                NotificationCenter.default.addObserver(self, selector: #selector(stoppedScrolling), name: Notification.Name("stopped-scrolling"), object: nil)
+            }
+        }
+    }
     var imageURL: URL? {
         didSet {
             guard track.image == nil else {
                 iconView.image = track.image
                 return
             }
-            if let url = imageURL {
+            if let url = imageURL, !dontDownload {
                 loadImage(from: url)
             }
         }
     }
+    var imageDownloadTask: URLSessionDataTask?
     
     var isOwner = false
     var queued = false {
         didSet {
-            let title = queued ? "E" : "Q"
-            queueButton.setTitle(title, for: .normal)
+            if queued {
+                queueButton.setTitle("", for: .normal)
+                queueButton.setImage(UIImage(named: "001-checkmark"), for: .normal)
+            } else {
+                queueButton.setTitle("Q", for: .normal)
+                queueButton.setImage(nil, for: .normal)
+            }
+        }
+    }
+    
+    @objc func stoppedScrolling() {
+        dontDownload = false
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("stopped-scrolling"), object: nil)
+        if let url = imageURL {
+            loadImage(from: url)
         }
     }
     
     func loadImage(from url: URL) {
-        URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
+        imageDownloadTask = URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
             guard error == nil else {
                 print(error!)
                 return
@@ -59,7 +81,9 @@ class TrackTableViewCell: UITableViewCell {
             DispatchQueue.main.async {
                 self.iconView.image = image
             }
-        }).resume()
+            self.imageDownloadTask = nil
+        })
+        imageDownloadTask?.resume()
     }
     
     @IBAction func enqueue(sender: UIButton) {
@@ -67,7 +91,7 @@ class TrackTableViewCell: UITableViewCell {
         
         FirebaseManager.shared.enqueue(track, pending: !self.isOwner)
         if isOwner {
-            SessionStore.session!.approved.append(track)
+            SessionStore.session!.queue.append(QueuedTrack.from(track))
         }
     }
 

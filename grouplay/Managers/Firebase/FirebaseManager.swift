@@ -13,7 +13,7 @@ import FirebaseDatabase
 class FirebaseManager {
     
     static let shared = FirebaseManager()
-    private let dbRef = Database.database().reference()
+    let dbRef = Database.database().reference()
     
     var sess: Session?
     var sessRef: DatabaseReference?
@@ -31,7 +31,7 @@ class FirebaseManager {
         ], withCompletionBlock: { (err, _) in
             if err == nil {
                 self.sessRef = Database.database().reference().child("sessions").child(code)
-                self.sess = Session(id: code, owner: uid, members: [:], approved: [], pending: [])
+                self.sess = Session(id: code, owner: uid, members: [:], queue: [])
                 completion(code, nil)
             } else {
                 completion(nil, "\(err!)")
@@ -51,22 +51,18 @@ class FirebaseManager {
                 return
             }
             
-            var approved: [Track] = []
-            var pending: [Track] = []
+            var queue: [QueuedTrack] = []
             
             if let queueDict = dict["queue"] as? [String:AnyObject] {
                 if let approvedDict = queueDict["approved"] as? [String:AnyObject] {
-                    approved = self.parseQueue(dict: approvedDict)
-                }
-                if let pendingDict = queueDict["pending"] as? [String:AnyObject] {
-                    pending = self.parseQueue(dict: pendingDict)
+                    queue = self.parseQueue(dict: approvedDict)
                 }
             }
             
             let members = dict["members"] as? [String:[String:AnyObject]] ?? [String:[String:AnyObject]]()
             
             self.sessRef = Database.database().reference().child("sessions").child(code)
-            self.sess = Session(id: code, owner: owner, members: members, approved: approved, pending: pending)
+            self.sess = Session(id: code, owner: owner, members: members, queue: queue)
             
             completion(self.sess, nil)
         })
@@ -114,6 +110,16 @@ class FirebaseManager {
             
             sessRef?.child("tmp_owner").setValue(newOwner)
         }
+    }
+    
+    func checkForCollision(_ name: String, comp: @escaping (Bool) -> Void) {
+        sessRef?.child("sessions").observeSingleEvent(of: .value, with: { snap in
+            guard let val = snap.value as? [String:AnyObject] else {
+                comp(true)
+                return
+            }
+            comp(val.keys.contains(name))
+        })
     }
     
 }

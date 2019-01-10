@@ -15,17 +15,15 @@ class Session {
     var id: String
     var owner: String
     var members: [String:[String:AnyObject]]
-    var approved: [Track]
-    var pending: [Track]
+    var queue: [QueuedTrack]
     
     var current: CurrTrack?
     
-    init(id: String, owner: String, members: [String:[String:AnyObject]], approved: [Track], pending: [Track]) {
+    init(id: String, owner: String, members: [String:[String:AnyObject]], queue: [QueuedTrack]) {
         self.id = id
         self.owner = owner
         self.members = members
-        self.approved = approved
-        self.pending = pending
+        self.queue = queue
     }
 
 }

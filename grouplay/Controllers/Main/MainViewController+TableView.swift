@@ -37,10 +37,14 @@ extension MainViewController {
         trackCell.artistLabel.text = track.artist
         
         trackCell.track = track
+        
+        if scrolling {
+            trackCell.dontDownload = true
+        }
         trackCell.imageURL = track.albumImageURL
         
         trackCell.isOwner = isOwner
-        trackCell.queued = SessionStore.session?.approved.contains(where: { $0.trackID == track.trackID }) ?? false
+        trackCell.queued = SessionStore.session?.queue.contains(where: { $0.trackID == track.trackID }) ?? false
         
         return trackCell
     }
@@ -51,8 +55,25 @@ extension MainViewController {
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
             self.firstPlayOccurred = true
             self.paused = false
-            self.current = self.tracks[indexPath.row]
+            
+            self.current = QueuedTrack.from(self.tracks[indexPath.row])
         })
+    }
+    
+    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let trackCell = cell as? TrackTableViewCell else { return }
+        if let downloadTask = trackCell.imageDownloadTask {
+            downloadTask.cancel()
+        }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        scrolling = true
+    }
+    
+    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
+        scrolling = false
+        NotificationCenter.default.post(name: Notification.Name("stopped-scrolling"), object: nil)
     }
     
 }

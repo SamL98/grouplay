@@ -149,7 +149,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 uid: ["username": username, "has_premium": hasPremium]
             ]
             
-            SessionStore.session = Session(id: code!, owner: uid, members: memberDict, approved: [], pending: [])
+            SessionStore.session = Session(id: code!, owner: uid, members: memberDict, queue: [])
             self.recents.append(code!)
             
             UserDefaults.standard.set(self.recents, forKey: "recents")

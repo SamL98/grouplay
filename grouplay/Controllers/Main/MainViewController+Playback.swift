@@ -25,7 +25,7 @@ extension MainViewController {
     
     // Delegate method called when a track is being played. Dequeue from the database (if from that queue) and update the currView.
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStartPlayingTrack trackUri: String!) {
-        guard let nextUp = SessionStore.session!.approved.first(where: { "spotify:track:" + $0.trackID == trackUri }) else {
+        guard let nextUp = SessionStore.session!.queue.first(where: { "spotify:track:" + $0.trackID == trackUri }) else {
             print("could not find track in session")
             if current != nil {
                 FirebaseManager.shared.setCurrent(current)
@@ -34,7 +34,7 @@ extension MainViewController {
         }
         
         FirebaseManager.shared.dequeue(nextUp, pending: false)
-        SessionStore.session!.approved = SessionStore.session!.approved.filter({ $0.trackID != nextUp.trackID })
+        SessionStore.session!.queue = SessionStore.session!.queue.filter({ $0.trackID != nextUp.trackID })
         
         paused = false
         current = nextUp
@@ -45,7 +45,7 @@ extension MainViewController {
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didStopPlayingTrack trackUri: String!) {
         prev.append(current)
         
-        guard SessionStore.session!.approved.count > 0 else {
+        guard SessionStore.session!.queue.count > 0 else {
             print("no remaining songs in queue")
             
             if isOwner {
@@ -56,14 +56,14 @@ extension MainViewController {
             return
         }
         
-        let nextUp = SessionStore.session!.approved[0].trackID
+        let nextUp = SessionStore.session!.queue[0].trackID
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + nextUp, startingWith: 0, startingWithPosition: 0.0, callback: nil)
     }
     
     @objc func queueChanged() {
         NotificationCenter.default.removeObserver(self, name: Notification.Name(rawValue: "queue-changed"), object: nil)
         
-        guard let nextUp = SessionStore.session?.approved.first else {
+        guard let nextUp = SessionStore.session?.queue.first else {
             print("song went into pending")
             NotificationCenter.default.addObserver(self, selector: #selector(queueChanged), name: Notification.Name(rawValue: "queue-changed"), object: nil)
             return
@@ -115,13 +115,13 @@ extension MainViewController {
             return
         }
         
-        SessionStore.session?.approved.insert(current, at: 0)
+        SessionStore.session?.queue.insert(current, at: 0)
         
         var insertBefore = Date.now()
-        if SessionStore.session!.approved.count > 1 { insertBefore = SessionStore.session!.approved[1].timestamp }
+        if SessionStore.session!.queue.count > 1 { insertBefore = SessionStore.session!.queue[1].timestamp }
         FirebaseManager.shared.insert(current, pending: false, before: insertBefore)
         
-        SessionStore.session?.approved.insert(prevTrack, at: 0)
+        SessionStore.session?.queue.insert(prevTrack, at: 0)
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + prevTrack.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
     }
     

@@ -13,7 +13,7 @@ import FirebaseDatabase
 extension FirebaseManager {
     
     // Observe the realtime current track in the database. Only called if the session is not owned by the current user.
-    func fetchCurrent(isOwner: Bool, completion: @escaping (Track?, NSError?) -> Void) {
+    func fetchCurrent(isOwner: Bool, completion: @escaping (QueuedTrack?, NSError?) -> Void) {
         if sessRef == nil {
             print("sess ref nil")
             completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
@@ -41,14 +41,19 @@ extension FirebaseManager {
                 guard curr.trackID != id else { return }
             }
             
-            let track = Track(title: title,
+            let track = QueuedTrack(title: title,
                               artist: artist,
                               trackID: id,
                               imageURL: URL(string: imgUrl)!,
                               image: nil,
                               preview: nil,
                               duration: duration,
-                              timestamp: timestamp)
+                              timestamp: timestamp,
+                              queuer: "username")
+            
+            if let queuer = val["queuer"] as? String {
+                track.queuer = queuer
+            }
         
             completion(track,  nil)
         }
@@ -71,14 +76,15 @@ extension FirebaseManager {
     }
     
     // Set the current track in the database. Only called if the session is owned by the current user.
-    func setCurrent(_ track: Track) {
+    func setCurrent(_ track: QueuedTrack) {
         sessRef?.child("current").setValue([
             "id": track.trackID,
             "title": track.title,
             "artist": track.artist,
             "imageURL": "\(track.albumImageURL)",
             "duration": track.duration,
-            "timestamp": Date.now()
+            "timestamp": Date.now(),
+            "queuer": track.queuer
             ])
     }
     

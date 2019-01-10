@@ -42,7 +42,6 @@ class SpotifyManager {
     
     static let shared = SpotifyManager()
     let defaults = UserDefaults.standard
-    let webView = WebView()
     let oauth = OAuth2Swift(consumerKey: Constants.Keys.client_id, consumerSecret: Constants.Keys.client_secret, authorizeUrl: URLs.authorize_url, accessTokenUrl: URLs.access_token_url, responseType: Constants.Components.response_type, contentType: Constants.Components.content_type)
     
     var session: SPTSession!
@@ -52,6 +51,10 @@ class SpotifyManager {
     // For information on how authentication is done, look at both OAuthSwift documentation and the Spotify API OAuth guide.
     
     var loginComp: (() -> Void)!
+    
+    func setAuthHandler(for vc: UIViewController) {
+        oauth.authorizeURLHandler = SafariURLHandler(viewController: vc, oauthSwift: oauth)
+    }
     
     func login(onCompletion: @escaping () -> Void) {
         print("logging in to spotify")
@@ -300,7 +303,7 @@ class SpotifyManager {
                     timeLeft -= Int((Date.now() - timestamp!/1000))
                 }
                 
-                FirebaseManager.shared.setCurrent(track)
+                FirebaseManager.shared.setCurrent(QueuedTrack.from(track))
                 completion(track, timeLeft == 0 ? nil : timeLeft/1000, nil)
             } else {
                 completion(nil, nil, NSError(domain: "current-fetch", code: 421, userInfo: nil))

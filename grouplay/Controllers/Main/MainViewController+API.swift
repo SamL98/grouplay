@@ -50,7 +50,7 @@ extension MainViewController {
         }
     }
     
-    func parseCurr(track: Track?, err: NSError?) {
+    func parseCurr(track: QueuedTrack?, err: NSError?) {
         guard err == nil else {
             print("parsing curr: \(err!)")
             self.currViewDisplayed = true

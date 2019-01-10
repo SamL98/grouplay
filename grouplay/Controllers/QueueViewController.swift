@@ -41,20 +41,21 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return session.approved.count
+        return session.queue.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "queue cell")!
-        guard let trackCell = cell as? TrackTableViewCell else {
+        guard let trackCell = cell as? QueueTableViewCell else {
             return cell
         }
         
-        let track = session.approved[indexPath.row]
+        let track = session.queue[indexPath.row]
         trackCell.track = track
         trackCell.titleLabel.text = track.title
         trackCell.artistLabel.text = track.artist
         trackCell.imageURL = track.albumImageURL
+        trackCell.queuerLabel.text = track.queuer == "username" ? "" : "Queued by: \(track.queuer)"
         return trackCell
     }
     
@@ -65,8 +66,8 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         var actions = [UITableViewRowAction]()
         let remove = UITableViewRowAction(style: .destructive, title: "Remove", handler: { _, indexPath in
-            FirebaseManager.shared.dequeue(self.session.approved[indexPath.row], pending: false)
-            self.session.approved.remove(at: indexPath.row)
+            FirebaseManager.shared.dequeue(self.session.queue[indexPath.row], pending: false)
+            self.session.queue.remove(at: indexPath.row)
             self.tableView.reloadData()
         })
         
