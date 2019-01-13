@@ -7,8 +7,51 @@
 //
 
 import UIKit
+import MediaPlayer
 
 extension MainViewController {
+    
+    func setupMPCommandCenter() {
+        UIApplication.shared.beginReceivingRemoteControlEvents()
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        
+        MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().nextTrackCommand.addTarget(self, action: #selector(skip))
+        MPRemoteCommandCenter.shared().togglePlayPauseCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().togglePlayPauseCommand.addTarget(self, action: #selector(togglePause))
+        MPRemoteCommandCenter.shared().previousTrackCommand.isEnabled = true
+        MPRemoteCommandCenter.shared().previousTrackCommand.addTarget(self, action: #selector(back))
+        UserDefaults.standard.set(true, forKey: "controls-started")
+    }
+    
+    func updateLockScreen(with img: UIImage, elapsedTime: Int) {
+        if !firstPlayOccurred { return }
+        if current == nil { return }
+        
+        if !UserDefaults.standard.bool(forKey: "controls-started") {
+            setupMPCommandCenter()
+        }
+        
+        nowPlayingInfo = [String:Any]()
+        nowPlayingInfo[MPMediaItemPropertyTitle] = current.title
+        nowPlayingInfo[MPMediaItemPropertyArtist] = current.artist
+        nowPlayingInfo[MPMediaItemPropertyAlbumTitle] = albumName
+        nowPlayingInfo[MPMediaItemPropertyAlbumArtist] = albumArtist
+        nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = playbackRate
+        nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = Double(current.duration)
+        nowPlayingInfo[MPMediaItemPropertyMediaType] = MPMediaType.music
+        nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(elapsedTime)
+        nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: img.size, requestHandler: { (size) -> UIImage in
+            return self.currImageView.image!
+        })
+        
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePosition position: TimeInterval) {
+        guard let img = currImageView.image else { return }
+        //updateLockScreen(with: img, elapsedTime: Int(position))
+    }
     
     func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
         /*if isPlaying {
@@ -119,15 +162,10 @@ extension MainViewController {
         
         var insertBefore = Date.now()
         if SessionStore.session!.queue.count > 1 { insertBefore = SessionStore.session!.queue[1].timestamp }
-        FirebaseManager.shared.insert(current, pending: false, before: insertBefore)
+        _ = FirebaseManager.shared.insert(current, pending: false, before: insertBefore)
         
         SessionStore.session?.queue.insert(prevTrack, at: 0)
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + prevTrack.trackID, startingWith: 0, startingWithPosition: 0.0, callback: nil)
     }
-    
-    /*func audioStreaming(_ audioStreaming: SPTAudioStreamingController!, didChangePlaybackStatus isPlaying: Bool) {
-        if isPlaying { SpotifyManager.shared.deactivateSession() }
-        else { SpotifyManager.shared.reactivateSession() }
-    }*/
     
 }

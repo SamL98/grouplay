@@ -32,7 +32,7 @@ class InfoViewController: UIViewController, UITableViewDataSource, UITextFieldDe
             canEdit = sess.owner == uid
         }
         textField.isEnabled = canEdit
-        textField.text = sess.id
+        textField.text = sess.name
         
         for (_, member_dict) in sess.members {
             if member_dict.keys.contains("username") {
@@ -57,6 +57,9 @@ class InfoViewController: UIViewController, UITableViewDataSource, UITextFieldDe
     }
     
     func displayCollisionError() {
+        if let sess = SessionStore.session {
+            textField.text = sess.name
+        }
         let alert = UIAlertController(title: "Nope", message: "That names taken.", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {_ in
             alert.dismiss(animated: true, completion: nil)
@@ -64,17 +67,26 @@ class InfoViewController: UIViewController, UITableViewDataSource, UITextFieldDe
         present(alert, animated: true, completion: nil)
     }
     
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        guard let name = textField.text else { return }
-        if name == "" { return }
+    func updateSessionName(with name: String) {
+        SessionStore.session?.name = name
+        FirebaseManager.shared.updateId(with: name)
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard let name = textField.text else { return false }
+        if name == "" { return false }
+        textField.resignFirstResponder()
+
         FirebaseManager.shared.checkForCollision(name) { collided in
             if collided {
                 DispatchQueue.main.async {
-                    self.textField.text = self.sess.id
                     self.displayCollisionError()
                 }
+            } else {
+                self.updateSessionName(with: name)
             }
         }
+        return true
     }
 
 }

@@ -13,14 +13,16 @@ typealias CurrTrack = (track: Track, timeLeft: Int, timestamp: UInt64, playing: 
 class Session {
     
     var id: String
+    var name: String
     var owner: String
     var members: [String:[String:AnyObject]]
     var queue: [QueuedTrack]
     
     var current: CurrTrack?
     
-    init(id: String, owner: String, members: [String:[String:AnyObject]], queue: [QueuedTrack]) {
+    init(id: String, name: String, owner: String, members: [String:[String:AnyObject]], queue: [QueuedTrack]) {
         self.id = id
+        self.name = name
         self.owner = owner
         self.members = members
         self.queue = queue

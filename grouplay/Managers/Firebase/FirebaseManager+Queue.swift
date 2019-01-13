@@ -19,20 +19,28 @@ extension FirebaseManager {
     }
     
     // Enqueue the given track in the database. If the current user is the owner, it is automatically set to approved. Otherwise, it is pending.
-    func enqueue(_ track: Track, pending: Bool) {
-        insert(track, pending: false, before: Date.now())
+    func enqueue(_ track: Track, pending: Bool) -> String {
+        return insert(track, pending: false, before: Date.now())
     }
     
     // Remove the given track from the database queue.
-    func dequeue(_ track: Track, pending: Bool) {
+    func dequeue(_ track: QueuedTrack, pending: Bool) {
         let pathExt = pending ? "pending" : "approved"
-        sessRef?.child("queue").child(pathExt).child(track.trackID).removeValue()
+        
+        for t in SessionStore.session!.queue {
+            if t.trackID == track.trackID && t.queuer == track.queuer {
+                sessRef?.child("queue").child(pathExt).child(t.dbID).removeValue()
+                break
+            }
+        }
     }
     
     // Insert into the queue before the given position for when the previous track is skipped
-    func insert(_ track: Track, pending: Bool, before: UInt64) {
+    func insert(_ track: Track, pending: Bool, before: UInt64) -> String {
         let pathExt = pending ? "pending" : "approved"
-        sessRef?.child("queue").child(pathExt).child(track.trackID).setValue([
+        track.dbID = Utility.generateRandomStr(with: 15)
+        sessRef?.child("queue").child(pathExt).child(track.dbID).setValue([
+            "trackID": track.trackID,
             "title": track.title,
             "artist": track.artist,
             "imageURL": "\(track.albumImageURL)",
@@ -40,6 +48,7 @@ extension FirebaseManager {
             "timestamp": before-1,
             "queuer": UserDefaults.standard.string(forKey: "user_id") ?? "username"
             ])
+        return track.dbID
     }
     
     // MARK: Observers
@@ -63,7 +72,7 @@ extension FirebaseManager {
                 return
             }
             
-            let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
+            let newTrack = self.parseTrack(dbID: snap.key, trackDict: newTrackDict)
             var queue = sess.queue
             guard newTrack.trackID != "" && !queue.contains(where: { $0.trackID == newTrack.trackID }) else {
                 //print("new track is nil or is already in approved queue")
@@ -87,7 +96,7 @@ extension FirebaseManager {
                 return
             }
             
-            let newTrack = self.parseTrack(id: snap.key, trackDict: newTrackDict)
+            let newTrack = self.parseTrack(dbID: snap.key, trackDict: newTrackDict)
             var queue = sess.queue
             guard newTrack.trackID != "" && queue.contains(where: { $0.trackID == newTrack.trackID }) else {
                 //print("new track is nil or is already in approved queue")

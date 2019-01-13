@@ -419,7 +419,15 @@ class SpotifyManager {
             let urlString = optUrlStr,
             let url = URL(string: urlString) {
             
-            return Track(title: title, artist: artist, trackID: id, imageURL: url, image: nil, preview: nil, duration: trackObj["duration_ms"] as? Int ?? 0, timestamp: Date.now())
+            return Track(dbID: "",
+                         title: title,
+                         artist: artist,
+                         trackID: id,
+                         imageURL: url,
+                         image: nil,
+                         preview: nil,
+                         duration: trackObj["duration_ms"] as? Int ?? 0,
+                         timestamp: Date.now())
         }
         return nil
     }
@@ -439,7 +447,15 @@ class SpotifyManager {
                     let url = URL(string: urlStr) {
                     
                     //print(title, artist)
-                    let track = Track(title: title, artist: artist, trackID: id, imageURL: url, image: nil, preview: nil, duration: item["duration_ms"] as? Int ?? 0, timestamp: Date.now())
+                    let track = Track(dbID: "",
+                                      title: title,
+                                      artist: artist,
+                                      trackID: id,
+                                      imageURL: url,
+                                      image: nil,
+                                      preview: nil,
+                                      duration: item["duration_ms"] as? Int ?? 0,
+                                      timestamp: Date.now())
                     tracks.append(track)
                 }
             }

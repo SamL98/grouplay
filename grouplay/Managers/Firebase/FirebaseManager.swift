@@ -26,12 +26,13 @@ class FirebaseManager {
             return
         }
         dbRef.child("sessions").child(code).setValue([
+            "name": code as AnyObject,
             "owner": uid as AnyObject,
             "paused": true as AnyObject
         ], withCompletionBlock: { (err, _) in
             if err == nil {
                 self.sessRef = Database.database().reference().child("sessions").child(code)
-                self.sess = Session(id: code, owner: uid, members: [:], queue: [])
+                self.sess = Session(id: code, name: code, owner: uid, members: [:], queue: [])
                 completion(code, nil)
             } else {
                 completion(nil, "\(err!)")
@@ -61,8 +62,10 @@ class FirebaseManager {
             
             let members = dict["members"] as? [String:[String:AnyObject]] ?? [String:[String:AnyObject]]()
             
+            let name = dict["name"] as? String ?? code
+            
             self.sessRef = Database.database().reference().child("sessions").child(code)
-            self.sess = Session(id: code, owner: owner, members: members, queue: queue)
+            self.sess = Session(id: code, name: name, owner: owner, members: members, queue: queue)
             
             completion(self.sess, nil)
         })
@@ -113,13 +116,19 @@ class FirebaseManager {
     }
     
     func checkForCollision(_ name: String, comp: @escaping (Bool) -> Void) {
-        sessRef?.child("sessions").observeSingleEvent(of: .value, with: { snap in
-            guard let val = snap.value as? [String:AnyObject] else {
-                comp(true)
+        dbRef.child("session_names").observeSingleEvent(of: .value, with: { snap in
+            guard let val = snap.value as? [String:String] else {
+                comp(false)
                 return
             }
-            comp(val.keys.contains(name))
+            comp(val.values.contains(name))
         })
+    }
+    
+    func updateId(with name: String) {
+        guard let sess = SessionStore.session else { return }
+        dbRef.child("session_names").child(sess.id).setValue(name)
+        sessRef?.child("name").setValue(name)
     }
     
 }

@@ -51,7 +51,7 @@ extension MainViewController {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard isOwner else { return }
-        
+
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
             self.firstPlayOccurred = true
             self.paused = false
@@ -63,7 +63,7 @@ extension MainViewController {
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         guard let trackCell = cell as? TrackTableViewCell else { return }
         if let downloadTask = trackCell.imageDownloadTask {
-            downloadTask.cancel()
+            downloadTask.suspend()
         }
     }
     
@@ -73,7 +73,9 @@ extension MainViewController {
     
     func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
         scrolling = false
-        NotificationCenter.default.post(name: Notification.Name("stopped-scrolling"), object: nil)
+        DispatchQueue.global(qos: .userInitiated).async {
+            NotificationCenter.default.post(name: Notification.Name("stopped-scrolling"), object: nil)
+        }
     }
     
 }

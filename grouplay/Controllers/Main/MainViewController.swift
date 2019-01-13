@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MediaPlayer
 
 class MainViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, SPTAudioStreamingDelegate, SPTAudioStreamingPlaybackDelegate {
 
@@ -70,7 +71,13 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     // Time left in the current track
     var timeLeft = 0
     
-    var firstPlayOccurred = false
+    var firstPlayOccurred = false {
+        didSet {
+//            if let img = currImageView.image, firstPlayOccurred && !paused {
+//                updateLockScreen(with: img)
+//            }
+        }
+    }
     
     // When we update pause, we want to do one thing:
     //
@@ -81,6 +88,15 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
             
             let title = paused ? "Play" : "Pause"
             pauseButton.setTitle(title, for: .normal)
+            
+            if paused {
+                MPNowPlayingInfoCenter.default().playbackState = .paused
+            } else {
+//                if let img = currImageView.image, firstPlayOccurred {
+//                    updateLockScreen(with: img)
+//                }
+                MPNowPlayingInfoCenter.default().playbackState = .playing
+            }
         }
     }
     
@@ -116,11 +132,13 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     var scrolling = false
+    var nowPlayingInfo = [String:Any]()
+    let albumName = ""
+    let albumArtist = ""
+    let playbackRate = 1.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        navigationController?.navigationBar.topItem?.title = SessionStore.session?.id ?? ""
         
         paused = true
         
@@ -149,6 +167,12 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         fetchLibrary()
         fetchCurr()
         observePaused()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        navigationController?.navigationBar.topItem?.title = SessionStore.session?.name ?? ""
     }
     
     override func viewDidAppear(_ animated: Bool) {

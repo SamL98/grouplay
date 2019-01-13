@@ -16,6 +16,7 @@ class TrackTableViewCell: UITableViewCell {
     @IBOutlet weak var queueButton: UIButton!
     
     var track: Track!
+    var queuedTrack: QueuedTrack?
     
     var dontDownload = false {
         didSet {
@@ -41,6 +42,9 @@ class TrackTableViewCell: UITableViewCell {
     var queued = false {
         didSet {
             if queued {
+                queuedTrack = QueuedTrack.from(track)
+                queuedTrack?.queuer = UserDefaults.standard.string(forKey: "user_id") ?? "username"
+                
                 queueButton.setTitle("", for: .normal)
                 queueButton.setImage(UIImage(named: "001-checkmark"), for: .normal)
             } else {
@@ -59,6 +63,11 @@ class TrackTableViewCell: UITableViewCell {
     }
     
     func loadImage(from url: URL) {
+        if imageDownloadTask != nil {
+            imageDownloadTask?.resume()
+            return
+        }
+        
         imageDownloadTask = URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
             guard error == nil else {
                 print(error!)
@@ -77,7 +86,7 @@ class TrackTableViewCell: UITableViewCell {
                 return
             }
             
-            self.track.image = image
+            //self.track.image = image
             DispatchQueue.main.async {
                 self.iconView.image = image
             }
@@ -87,11 +96,21 @@ class TrackTableViewCell: UITableViewCell {
     }
     
     @IBAction func enqueue(sender: UIButton) {
-        if !queued { queued = true }
-        
-        FirebaseManager.shared.enqueue(track, pending: !self.isOwner)
-        if isOwner {
-            SessionStore.session!.queue.append(QueuedTrack.from(track))
+        queued = !queued
+        if queued {
+            let dbID = FirebaseManager.shared.enqueue(track, pending: !self.isOwner)
+            track.dbID = dbID
+            
+            if isOwner {
+                SessionStore.session!.queue.append(queuedTrack!)
+            }
+        } else {
+            if let qt = queuedTrack {
+                FirebaseManager.shared.dequeue(qt, pending: false)
+                if isOwner {
+                    SessionStore.session!.queue = SessionStore.session!.queue.filter({ $0.dbID != track.dbID })
+                }
+            }
         }
     }
 
