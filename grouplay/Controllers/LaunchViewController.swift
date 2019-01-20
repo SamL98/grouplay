@@ -15,16 +15,19 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     var isOwner = false
     var name: String?
     
-    var recents = [String]() {
-        didSet {
-            tableView.reloadData()
-        }
-    }
+    var recents = [String:String]()
+    var recentNames = [String]()
+    var recentCodes = [String]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        recents = UserDefaults.standard.array(forKey: "recents") as? [String] ?? []
+        recents = UserDefaults.standard.dictionary(forKey: "recents") as? [String:String] ?? [:]
+        for (code, name) in recents {
+            recentCodes.append(code)
+            recentNames.append(name)
+        }
+        tableView.reloadData()
 
         guard
             let uid = UserDefaults.standard.string(forKey: "uid"),
@@ -89,12 +92,13 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "recent cell")!
-        (cell.viewWithTag(10) as! UILabel).text = recents[indexPath.row]
+        (cell.viewWithTag(10) as! UILabel).text = recentNames[indexPath.row]
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        join(name: recents[indexPath.row])
+        name = recentNames[indexPath.row]
+        join(code: recentCodes[indexPath.row])
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -108,20 +112,56 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
-    func join(name: String) {
-        FirebaseManager.shared.joinSession(name: name, completion: { errStr in
+    func join(code: String) {
+        FirebaseManager.shared.joinSession(code: code, completion: { _, errStr in
             if let error = errStr
             {
                 print(error)
                 return
             }
             
-            if !self.recents.contains(name) {
-                self.recents.append(name)
-                UserDefaults.standard.set(self.recents, forKey: "recents")
+            guard
+                let sess = SessionStore.current
+            else
+            {
+                return
             }
             
-            UserDefaults.standard.set(name, forKey: "currName")
+            self.recentNames[self.recentCodes.firstIndex(where: { $0 == code })!] = sess.name
+            self.recents[code] = sess.name
+            UserDefaults.standard.set(self.recents, forKey: "recents")
+            
+            UserDefaults.standard.set(self.name, forKey: "currName")
+            
+            DispatchQueue.main.async {
+                self.isOwner = UserStore.current?.isOwner() ?? false
+                self.performSegue(withIdentifier: "to search", sender: nil)
+            }
+        })
+    }
+    
+    func join(name: String) {
+        FirebaseManager.shared.joinSession(name: name, completion: { code, errStr in
+            if let error = errStr
+            {
+                print(error)
+                return
+            }
+            
+            if code == nil
+            {
+                print("Code is nil from session join")
+                return
+            }
+            
+            if !self.recentNames.contains(name) {
+                self.recents[code!] = name
+                print(self.recents, name)
+                UserDefaults.standard.set(self.recents, forKey: "recents")
+                self.tableView.reloadData()
+            }
+            
+            UserDefaults.standard.set(self.name, forKey: "currName")
             
             DispatchQueue.main.async {
                 self.isOwner = UserStore.current?.isOwner() ?? false
@@ -147,9 +187,9 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 return
             }
 
-            self.recents.append(code!)
+            self.recentNames.append(code!)
             
-            UserDefaults.standard.set(self.recents, forKey: "recents")
+            UserDefaults.standard.set(self.recentNames, forKey: "recents")
             UserDefaults.standard.set(code!, forKey: "currName")
             
             DispatchQueue.main.async {
@@ -166,9 +206,9 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         var actions = [UITableViewRowAction]()
         let remove = UITableViewRowAction(style: .destructive, title: "Remove", handler: { _, indexPath in
-            self.recents.remove(at: indexPath.row)
+            self.recentNames.remove(at: indexPath.row)
             self.tableView.reloadData()
-            UserDefaults.standard.set(self.recents, forKey: "recents")
+            UserDefaults.standard.set(self.recentNames, forKey: "recents")
         })
         actions.append(remove)
         return actions
@@ -176,7 +216,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBAction func deleteAll(sender: UIButton) {
         UserDefaults.standard.set([], forKey: "recents")
-        self.recents = []
+        self.recentNames = []
         tableView.reloadData()
     }
     

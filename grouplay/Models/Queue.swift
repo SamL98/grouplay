@@ -10,6 +10,8 @@ import Foundation
 
 class Queue {
     
+    // MARK: - JSON
+    
     class func marshal(json: [String:AnyObject]) -> Queue? {
         var tracks = [QueuedTrack]()
         for (uuid, val) in json {
@@ -37,30 +39,37 @@ class Queue {
         return Queue(tracks: [])
     }
     
+    // MARK: - Properties
+    
     var tracks: [QueuedTrack]
+    
+    // MARK: - Initializer
     
     init(tracks: [QueuedTrack]) {
         self.tracks = tracks
     }
+    
+    // MARK: - Methods
 
     func prepend(_ track: QueuedTrack) {
         tracks.insert(track, at: 0)
     }
     
     func addTrack(_ track: QueuedTrack) {
+        tracks.append(track)
+        
+        if tracks.count == 1 {
+            return
+        }
+        
         // Propagate the track up the queue if for some reason it's timestamp is earlier than those existing in the queue
         
-        if tracks.count == 0 {
-            tracks.append(track)
-        }
+        var i = tracks.endIndex-1 // i is the index of the recently-added track
         
-        var i = tracks.endIndex-1
-        
-        while i > 0 && track.timestamp < tracks[i].timestamp {
+        while i > 0 && tracks[i].timestamp < tracks[i-1].timestamp {
+            tracks.swapAt(i, i-1)
             i -= 1
         }
-        
-        tracks.insert(track, at: i)
     }
     
     func removeTrack(_ track: QueuedTrack) {
@@ -68,6 +77,11 @@ class Queue {
         
         while i < tracks.count && tracks[i].uuid != track.uuid {
             i += 1
+        }
+        
+        if i == tracks.count
+        {
+            return
         }
         
         tracks.remove(at: i)

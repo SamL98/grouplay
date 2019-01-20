@@ -48,13 +48,13 @@ class FirebaseManager {
         })
     }
     
-    func joinSession(code: String, completion: @escaping (String?) -> Void) {
+    func joinSession(code: String, completion: @escaping (String?, String?) -> Void) {
         dbRef.child("sessions").child(code).observeSingleEvent(of: .value, with: { (snapshot) in
             guard
                 let dict = snapshot.value as? [String:AnyObject]
                 else
             {
-                completion("Unable to parse snapshot value")
+                completion(nil, "Unable to parse snapshot value")
                 return
             }
             
@@ -62,30 +62,30 @@ class FirebaseManager {
                 let session = Session.marshal(code: code, json: dict)
                 else
             {
-                completion("Unable to marshal session from json")
+                completion(nil, "Unable to marshal session from json")
                 return
             }
             
             self.sessRef = Database.database().reference().child("sessions").child(code)
             SessionStore.current = session
             
-            completion(nil)
+            completion(code, nil)
         })
     }
     
-    func joinSession(name: String, completion: @escaping (String?) -> Void) {
+    func joinSession(name: String, completion: @escaping (String?, String?) -> Void) {
         dbRef.child("session_names").observeSingleEvent(of: .value, with: { snapshot in
             guard
                 let dict = snapshot.value as? [String:String]
             else
             {
-                completion("Unable to parse snapshot value for session names")
+                completion(nil, "Unable to parse snapshot value for session names")
                 return
             }
             
             if !dict.keys.contains(name)
             {
-                completion("Session name: \(name) does not exist")
+                completion(nil, "Session name: \(name) does not exist")
                 return
             }
             
@@ -120,10 +120,14 @@ class FirebaseManager {
             let sess = SessionStore.current
         else
         {
+            print("Could not update session name")
             return
         }
-        dbRef.child("session_names").child(sess.id).setValue(name)
+        
+        dbRef.child("session_names").child(sess.name).removeValue()
+        dbRef.child("session_names").child(name).setValue(sess.id)
         sessRef?.child("name").setValue(name)
+        sess.name = name
     }
     
 }

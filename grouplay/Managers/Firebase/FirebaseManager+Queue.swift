@@ -32,12 +32,12 @@ extension FirebaseManager {
     private func observeQueueAdd() {
         sessRef?.child("queue").observe(.childAdded, with: { snap in
             let uuid = snap.key
-            print("Observing \(uuid) just added")
             
             if
                 let queue = SessionStore.current?.queue.tracks,
                 queue.contains(where: { $0.uuid == uuid })
             {
+                print("Queue already contains uuid: \(uuid)")
                 return
             }
             
@@ -72,6 +72,14 @@ extension FirebaseManager {
             }
 
             let uuid = snap.key
+            
+            if
+                let removed = SessionStore.current?.removed,
+                removed.contains(uuid)
+            {
+                print("The current user already removed this track -- ignoring")
+                return
+            }
             
             guard
                 let track = QueuedTrack.marshal(uuid: uuid, json: trackJSON)

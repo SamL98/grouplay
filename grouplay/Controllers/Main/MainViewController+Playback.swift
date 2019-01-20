@@ -65,6 +65,9 @@ extension MainViewController {
         
         paused = false
         SessionStore.current?.setCurrent(nextUp)
+        updateCurrentUI()
+        
+        SessionStore.current?.removeTrack(nextUp)
     }
     
     // Delegate method called when a track is done playing. Append to the list of previous songs (for backtracking) and play the next song.

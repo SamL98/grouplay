@@ -91,6 +91,7 @@ class Session {
             ]
     }
     
+    
     // MARK: - Properties
     
     var id: String
@@ -99,6 +100,16 @@ class Session {
     var members: MemberSet
     var queue: Queue
     var current: QueuedTrack?
+    
+    // This array hold uuids of tracks that the current user has removed from the queue (either the owner from the queue page or withdrawn by a non-owner)
+    // It isn't needed (after I added the bounds check in Queue.removeTrack) but I added it for efficiency.
+    //
+    // When the user removes a track from the queue, it's uuid is added to this array. Then when the Firebase observer triggers for this removal,
+    // the completion handler will not trigger since it will see that the user removed this track.
+    //
+    // The completion handler should then remove this uuid from the array to save memory.
+    var removed = [String]()
+    
     
     // MARK: - Initializer
     
@@ -118,6 +129,7 @@ class Session {
         FirebaseManager.shared.updateId(with: name)
     }
     
+    
     // MARK: - Members
     
     func addMember(_ member: Member) {
@@ -133,13 +145,16 @@ class Session {
     // MARK: - Current
     
     func setCurrent(_ track: QueuedTrack) {
-        if
+        /*if
             let oldTrack = current,
             let session = SessionStore.current
         {
             FirebaseManager.shared.removeTrack(oldTrack)
             FirebaseManager.shared.archiveTrack(oldTrack, to: session)
-        }
+        }*/
+        
+        //FirebaseManager.shared.removeTrack(track)
+        //FirebaseManager.shared.archiveTrack(track, to: SessionStore.current!)
 
         current = track
         FirebaseManager.shared.setCurrent(track)
@@ -174,8 +189,11 @@ class Session {
     }
     
     func removeTrack(_ track: QueuedTrack) {
+        removed.append(track.uuid)
         queue.removeTrack(track)
+        
         FirebaseManager.shared.removeTrack(track)
+        FirebaseManager.shared.archiveTrack(track, to: SessionStore.current!)
     }
     
     func trackAdded(_ track: QueuedTrack) {
