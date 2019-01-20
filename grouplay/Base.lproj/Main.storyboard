@@ -492,9 +492,9 @@
                                 <rect key="frame" x="8" y="740" width="359" height="65"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XEb-XT-8t6">
-                                        <rect key="frame" x="159.5" y="16.5" width="40" height="32"/>
+                                        <rect key="frame" x="164.5" y="16.5" width="30" height="32"/>
                                         <fontDescription key="fontDescription" name="GillSans" family="Gill Sans" pointSize="17"/>
-                                        <state key="normal" title="Pause"/>
+                                        <state key="normal" title="Play"/>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fxn-s5-bEY">
                                         <rect key="frame" x="308" y="16.5" width="36" height="32"/>
