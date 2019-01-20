@@ -13,10 +13,6 @@ class TrackTableViewCell: UITableViewCell {
     @IBOutlet weak var iconView: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var artistLabel: UILabel!
-    @IBOutlet weak var queueButton: UIButton!
-    
-    var track: SpotifyTrack!
-    var queuedTrack: QueuedTrack?
     
     var dontDownload = false {
         didSet {
@@ -25,6 +21,7 @@ class TrackTableViewCell: UITableViewCell {
             }
         }
     }
+    
     var imageURL: URL? {
         didSet {
             if let url = imageURL, !dontDownload {
@@ -32,21 +29,8 @@ class TrackTableViewCell: UITableViewCell {
             }
         }
     }
-    var imageDownloadTask: URLSessionDataTask?
     
-    var isOwner = false
-
-    var queued = false {
-        didSet {
-            if queued {
-                queueButton.setTitle("", for: .normal)
-                queueButton.setImage(UIImage(named: "001-checkmark"), for: .normal)
-            } else {
-                queueButton.setTitle("Q", for: .normal)
-                queueButton.setImage(nil, for: .normal)
-            }
-        }
-    }
+    var imageDownloadTask: URLSessionDataTask?
     
     @objc func stoppedScrolling() {
         dontDownload = false
@@ -80,26 +64,12 @@ class TrackTableViewCell: UITableViewCell {
                 return
             }
             
-            //self.track.image = image
             DispatchQueue.main.async {
                 self.iconView.image = image
             }
             self.imageDownloadTask = nil
         })
         imageDownloadTask?.resume()
-    }
-    
-    @IBAction func enqueue(sender: UIButton) {
-        queued = !queued
-        
-        if queued {
-            SessionStore.current?.addTrack(track)
-            queuedTrack = SessionStore.current?.queue.tracks.last
-        } else {
-            if let qt = queuedTrack {
-                SessionStore.current?.removeTrack(qt)
-            }
-        }
     }
 
 }

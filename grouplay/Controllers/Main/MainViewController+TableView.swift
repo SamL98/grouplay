@@ -37,15 +37,10 @@ extension MainViewController {
         trackCell.titleLabel.text = track.title
         trackCell.artistLabel.text = track.artist
         
-        trackCell.track = track
-        
         if scrolling {
             trackCell.dontDownload = true
         }
         trackCell.imageURL = track.albumImageURL
-        
-        trackCell.isOwner = isOwner
-        trackCell.queued = SessionStore.current?.isQueued(track) ?? false
         
         return trackCell
     }
@@ -70,6 +65,46 @@ extension MainViewController {
             SessionStore.current?.setCurrent(queuedTrack)
             self.updateCurrentUI()
         })
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        guard
+            let sess = SessionStore.current,
+            let me = UserStore.current
+        else
+        {
+            return nil
+        }
+        
+        var style: UITableViewRowAction.Style
+        var title: String
+        var handler: (UITableViewRowAction, IndexPath) -> Void
+        
+        if sess.queue.tracks.contains(where: { $0.queuer == me.username && $0.trackID == tracks[indexPath.row].trackID })
+        {
+            style = .destructive
+            title = "Remove"
+            handler = { (_, path) in
+                guard
+                    let qt = SessionStore.current?.queue.tracks.first(where: { $0.queuer == me.username && $0.trackID == self.tracks[path.row].trackID })
+                else
+                {
+                    print("Could not get queued track from added array")
+                    return
+                }
+                SessionStore.current?.removeTrack(qt)
+            }
+        }
+        else
+        {
+            style = .normal
+            title = "Add"
+            handler = { (_, path) in
+                SessionStore.current?.addTrack(self.tracks[path.row])
+            }
+        }
+        
+        return [UITableViewRowAction(style: style, title: title, handler: handler)]
     }
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {

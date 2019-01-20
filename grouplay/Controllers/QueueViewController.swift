@@ -59,7 +59,6 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         let track = SessionStore.current!.queue.tracks[indexPath.row]
         
-        trackCell.track = SpotifyTrack.spotifyTrackFrom(track)
         trackCell.titleLabel.text = track.title
         trackCell.artistLabel.text = track.artist
         trackCell.imageURL = track.albumImageURL

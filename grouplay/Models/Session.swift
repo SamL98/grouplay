@@ -145,17 +145,6 @@ class Session {
     // MARK: - Current
     
     func setCurrent(_ track: QueuedTrack) {
-        /*if
-            let oldTrack = current,
-            let session = SessionStore.current
-        {
-            FirebaseManager.shared.removeTrack(oldTrack)
-            FirebaseManager.shared.archiveTrack(oldTrack, to: session)
-        }*/
-        
-        //FirebaseManager.shared.removeTrack(track)
-        //FirebaseManager.shared.archiveTrack(track, to: SessionStore.current!)
-
         current = track
         FirebaseManager.shared.setCurrent(track)
     }
@@ -184,6 +173,7 @@ class Session {
             print("Could not create queued track from Spotify track: \(track.trackID)")
             return
         }
+        
         queue.addTrack(queuedTrack)
         FirebaseManager.shared.addTrack(queuedTrack)
     }
