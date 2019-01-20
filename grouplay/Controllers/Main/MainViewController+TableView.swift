@@ -37,10 +37,11 @@ extension MainViewController {
         trackCell.titleLabel.text = track.title
         trackCell.artistLabel.text = track.artist
         
-        if scrolling {
-            trackCell.dontDownload = true
+        AlbumArtCache.shared.loadImage(for: track) { img in
+            DispatchQueue.main.async {
+                trackCell.iconView.image = img
+            }
         }
-        trackCell.imageURL = track.albumImageURL
         
         return trackCell
     }
@@ -105,24 +106,6 @@ extension MainViewController {
         }
         
         return [UITableViewRowAction(style: style, title: title, handler: handler)]
-    }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard let trackCell = cell as? TrackTableViewCell else { return }
-        if let downloadTask = trackCell.imageDownloadTask {
-            downloadTask.suspend()
-        }
-    }
-    
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        scrolling = true
-    }
-    
-    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-        scrolling = false
-        DispatchQueue.global(qos: .userInitiated).async {
-            NotificationCenter.default.post(name: Notification.Name("stopped-scrolling"), object: nil)
-        }
     }
     
 }

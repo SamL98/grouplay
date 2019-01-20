@@ -61,8 +61,13 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         trackCell.titleLabel.text = track.title
         trackCell.artistLabel.text = track.artist
-        trackCell.imageURL = track.albumImageURL
         trackCell.queuerLabel.text = "Queued by: \(track.queuer)"
+        
+        AlbumArtCache.shared.loadImage(for: track) { img in
+            DispatchQueue.main.async {
+                trackCell.iconView.image = img
+            }
+        }
 
         return trackCell
     }

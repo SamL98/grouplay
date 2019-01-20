@@ -91,7 +91,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
-    var scrolling = false
     var nowPlayingInfo = [String:Any]()
     let albumName = ""
     let albumArtist = ""

@@ -38,6 +38,8 @@
 		B7A3F0C321E6B5E000AA3BA4 /* QueueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A3F0C221E6B5E000AA3BA4 /* QueueTableViewCell.swift */; };
 		B7A3F0C521E6BF7F00AA3BA4 /* QueuedTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A3F0C421E6BF7F00AA3BA4 /* QueuedTrack.swift */; };
 		B7A3F0C721E6C9C800AA3BA4 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A3F0C621E6C9C800AA3BA4 /* InfoViewController.swift */; };
+		B7B7E10621F52D8F004926CD /* AlbumArtCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B7E10521F52D8F004926CD /* AlbumArtCache.swift */; };
+		B7B7E10821F52FA9004926CD /* MainViewController+Scroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B7E10721F52FA9004926CD /* MainViewController+Scroll.swift */; };
 		B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */; };
 		B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */; };
 		B7BB98FA1FD9B0D2007BDB0B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7BB98F81FD9B0D2007BDB0B /* Main.storyboard */; };
@@ -86,6 +88,8 @@
 		B7A3F0C221E6B5E000AA3BA4 /* QueueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueTableViewCell.swift; sourceTree = "<group>"; };
 		B7A3F0C421E6BF7F00AA3BA4 /* QueuedTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueuedTrack.swift; sourceTree = "<group>"; };
 		B7A3F0C621E6C9C800AA3BA4 /* InfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; };
+		B7B7E10521F52D8F004926CD /* AlbumArtCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtCache.swift; sourceTree = "<group>"; };
+		B7B7E10721F52FA9004926CD /* MainViewController+Scroll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+Scroll.swift"; sourceTree = "<group>"; };
 		B7BB98F11FD9B0D2007BDB0B /* grouplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = grouplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -143,6 +147,7 @@
 				B79FA7C21FDAF0E600A00497 /* MainViewController.swift */,
 				B70ADE0820A4A16900330A9C /* MainViewController+Playback.swift */,
 				B70ADE0A20A4A25B00330A9C /* MainViewController+TableView.swift */,
+				B7B7E10721F52FA9004926CD /* MainViewController+Scroll.swift */,
 				B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */,
 				B70ADE0E20A4A30200330A9C /* MainViewController+API.swift */,
 			);
@@ -213,6 +218,7 @@
 				B76C9CD721EBC6DA0093711C /* Member.swift */,
 				B76C9CD921EBC7460093711C /* MemberSet.swift */,
 				B76C9CD521EBC5EA0093711C /* Queue.swift */,
+				B7B7E10521F52D8F004926CD /* AlbumArtCache.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -386,6 +392,7 @@
 				B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */,
 				B70ADE02209F69BD00330A9C /* BridgeViewController.m in Sources */,
 				B747DDED21344C2E001996D2 /* FirebaseManager+Current.swift in Sources */,
+				B7B7E10621F52D8F004926CD /* AlbumArtCache.swift in Sources */,
 				B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */,
 				B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */,
 				B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */,
@@ -403,6 +410,7 @@
 				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
 				B70ADE0620A20E0600330A9C /* SessionStore.swift in Sources */,
 				B70ADE0B20A4A25B00330A9C /* MainViewController+TableView.swift in Sources */,
+				B7B7E10821F52FA9004926CD /* MainViewController+Scroll.swift in Sources */,
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
 				B7A3F0C521E6BF7F00AA3BA4 /* QueuedTrack.swift in Sources */,
 				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
