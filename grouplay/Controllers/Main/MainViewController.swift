@@ -37,71 +37,31 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         }
     }
     
-    // When the current track is set, we want to:
-    //
-    // 1. update the current view display with the track info (includes saved button)
-    // 2. set the track as the current in the database if the current user is the owner
-    // 3. show the current view
-    var current: QueuedTrack! {
-        didSet {
-            guard current != nil else { return }
-            
-            if let oldTrack = oldValue, let sess = SessionStore.session {
-                FirebaseManager.shared.archiveTrack(oldTrack, to: sess)
-            }
-
-            updateCurrDisplay(with: current)
-            setCurrInDB(current)
-            showCurrView()
-            
-            timeLeft = Int(current.duration/1000)
-        }
-    }
-    
-    var tracks = [Track]() // the tracks to be displayed in the tableview
+    var tracks = [SpotifyTrack]() // the tracks to be displayed in the tableview
     var prev = [QueuedTrack]() // the previous tracks played so that the owner can go to the previous song indefinitely
-    var library = [Track]() // the current user's library
-    var searched = [Track]() // the result of the current search if searching
-    var filteredLibrary = [Track]()
+    var library = [SpotifyTrack]() // the current user's library
+    var searched = [SpotifyTrack]() // the result of the current search if searching
+    var filteredLibrary = [SpotifyTrack]()
     var searchInputText = ""
     var segControlSearched = false
     
     var offsetCount = 0 // offset count for fetching the user's library
     
-    // Time left in the current track
-    var timeLeft = 0
-    
-    var firstPlayOccurred = false {
-        didSet {
-//            if let img = currImageView.image, firstPlayOccurred && !paused {
-//                updateLockScreen(with: img)
-//            }
-        }
-    }
-    
-    // When we update pause, we want to do one thing:
-    //
-    // 1. Update the title of the toggle pause button
+    var firstPlayOccurred = false    
     var paused = true {
         didSet {
+            if paused {
+                MPNowPlayingInfoCenter.default().playbackState = .paused
+            } else {
+                MPNowPlayingInfoCenter.default().playbackState = .playing
+            }
+
             guard isOwner else { return }
             
             let title = paused ? "Play" : "Pause"
             pauseButton.setTitle(title, for: .normal)
-            
-            if paused {
-                MPNowPlayingInfoCenter.default().playbackState = .paused
-            } else {
-//                if let img = currImageView.image, firstPlayOccurred {
-//                    updateLockScreen(with: img)
-//                }
-                MPNowPlayingInfoCenter.default().playbackState = .playing
-            }
         }
     }
-    
-    var timer: Timer!
-    var timerStarted = false
     
     var currViewDisplayed = false
     var playbackDisplayed = false
@@ -140,8 +100,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        paused = true
-        
         searchBar.delegate = self
         tableView.dataSource = self
         tableView.delegate = self
@@ -161,57 +119,55 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
         currTopConstr = constraints.first(where: { $0.identifier! == "current-top" })
         currBottomConstr = constraints.first(where: { $0.identifier! == "current-bottom" })
         
-        // *** Interact with the backend ***
+        UserStore.current?.joinCurrentSession()
+        SessionStore.current?.syncQueue()
         
-        observeQueue()
+        if !(UserStore.current?.isOwner() ?? false) {
+            SessionStore.current?.syncCurrent()
+        } else {
+            updateCurrentUI()
+        }
+        
         fetchLibrary()
-        fetchCurr()
-        observePaused()
+        observeDatabase()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        navigationController?.navigationBar.topItem?.title = SessionStore.session?.name ?? ""
+        navigationController?.navigationBar.topItem?.title = SessionStore.current?.name ?? ""
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        // We only want to start the timer if we are the owner of the session
         if !isOwner { return }
         
         SpotifyManager.shared.player.delegate = self
         SpotifyManager.shared.player.playbackDelegate = self
-        
-        // If the app is entering the foreground after resigning active, then the timer will have been invalidated
-        // therefore, we want to start the timer again in that case.
-        if let savedTimerState = UserDefaults.standard.object(forKey: "timerStarted") { timerStarted = savedTimerState as! Bool }
-
-        if !timerStarted {
-            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(MainViewController.decrementTimer), userInfo: nil, repeats: true)
-            timerStarted = true
-            UserDefaults.standard.set(true, forKey: "timerStarted")
-        }
     }
-    
-    // MARK: Timer Methods
-    
-    @objc func decrementTimer() {
-        if !paused { timeLeft -= 1 }
+
+    func observeDatabase() {
+        NotificationCenter.default.addObserver(self, 
+                                               selector: #selector(updateCurrentUI),
+                                               name: Notification.Name("current-changed"),
+                                               object: nil)
     }
     
     // MARK: current didSet
-    
-    func setCurrInDB(_ track: QueuedTrack) {
-        guard isOwner else { return }
-        FirebaseManager.shared.setCurrent(track)
+
+    @objc func updateCurrentUI() {
+        DispatchQueue.main.async {
+            self.updateCurrDisplay()
+            self.showCurrView()
+        }
     }
     
-    func updateCurrDisplay(with track: Track) {
+    func updateCurrDisplay() {
+        guard let current = SessionStore.current?.current else { return }
+
         self.currTitleLabel.text = current.title
         self.currArtistLabel.text = current.artist
-        self.saved = library.contains(where: { $0.trackID == track.trackID })
+        self.saved = library.contains(where: { $0.trackID == current.trackID })
         
         Utility.loadImage(from: current.albumImageURL, completion: { img in
             DispatchQueue.main.async {
@@ -223,7 +179,6 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     func toggleCurrView(hide: Bool) {
         let multiplier: CGFloat = hide ? -1.0 : 1.0
         currBottomConstr.constant += (self.currView.bounds.height + 8.0) * multiplier
-        
         UIView.animate(withDuration: 0.35, animations: { self.view.layoutIfNeeded() })
     }
     
@@ -294,24 +249,23 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     }
     
     @IBAction func toggleSave(_ sender: UIButton) {
-        guard current != nil else {
-            print("no current, stop saving")
-            return
-        }
+        guard let current = SessionStore.current?.current else { return }
+        let spCurrent = SpotifyTrack.spotifyTrackFrom(current)
         
         if saved {
             guard let idx = self.library.index(where: { $0.trackID == current.trackID }) else { return }
             self.library.remove(at: idx)
-            SpotifyManager.shared.unsave(self.current)
+            SpotifyManager.shared.unsave(spCurrent)
         } else {
-            self.library.insert(current, at: 0)
-            SpotifyManager.shared.save(self.current)
+            self.library.insert(spCurrent, at: 0)
+            SpotifyManager.shared.save(spCurrent)
         }
+
         saved = !saved
     }
     
     @IBAction func goBack(_ sender: UIBarButtonItem) {
-        FirebaseManager.shared.leave()
+        UserStore.current?.leaveCurrentSession()
         dismiss(animated: true, completion: nil)
     }
     

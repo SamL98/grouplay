@@ -24,6 +24,7 @@ extension MainViewController {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "trackCell")!
+
         guard let trackCell = cell as? TrackTableViewCell else {
             return cell
         }
@@ -44,7 +45,7 @@ extension MainViewController {
         trackCell.imageURL = track.albumImageURL
         
         trackCell.isOwner = isOwner
-        trackCell.queued = SessionStore.session?.queue.contains(where: { $0.trackID == track.trackID }) ?? false
+        trackCell.queued = SessionStore.current?.isQueued(track) ?? false
         
         return trackCell
     }
@@ -52,11 +53,22 @@ extension MainViewController {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard isOwner else { return }
 
-        SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, startingWith: 0, startingWithPosition: 0.0, callback: {_ in
+        SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, 
+                                                    startingWith: 0, 
+                                                    startingWithPosition: 0.0, callback: {_ in
+            guard
+                let queuedTrack = QueuedTrack.queuedTrackFrom(self.tracks[indexPath.row])
+            else
+            {
+                print("Could not create queued track from Spotify track: \(self.tracks[indexPath.row].trackID)")
+                return
+            }
+                                                        
             self.firstPlayOccurred = true
             self.paused = false
-            
-            self.current = QueuedTrack.from(self.tracks[indexPath.row])
+                                                        
+            SessionStore.current?.setCurrent(queuedTrack)
+            self.updateCurrentUI()
         })
     }
     

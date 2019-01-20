@@ -5,8 +5,8 @@ import AVFoundation
 class SpotifyManager {
     
     // Callback response typealias
-    typealias spotify_track_response = ([Track]?, NSError?) -> Void
-    typealias curr_response = (Track?, Int?, NSError?) -> Void
+    typealias spotify_track_response = ([SpotifyTrack]?, NSError?) -> Void
+    typealias curr_response = (SpotifyTrack?, Int?, NSError?) -> Void
     
     // MARK: Constants
     
@@ -210,7 +210,7 @@ class SpotifyManager {
                 guard let json = try response.jsonObject() as? [String:AnyObject] else { return }
                 guard let id = json["id"] as? String else { return }
                 
-                UserDefaults.standard.set(id, forKey: "user_id")
+                UserDefaults.standard.set(id, forKey: "username")
                 if let product = json["product"] as? String {
                     UserDefaults.standard.set(product == "premium", forKey: "hasPremium")
                 } else {
@@ -269,7 +269,7 @@ class SpotifyManager {
         })
     }
     
-    func fetchCurrent(completion: @escaping curr_response) {
+    /*func fetchCurrent(completion: @escaping curr_response) {
         //print("fetch current")
         let _ = oauth.client.get(URLs.current, success: { response in
             var json: [String:AnyObject]?
@@ -312,9 +312,9 @@ class SpotifyManager {
             print("error fetching current: \(error)")
             completion(nil, nil, NSError(domain: "current-fetch", code: 422, userInfo: nil))
         })
-    }
+    }*/
     
-    func save(_ track: Track) {
+    func save(_ track: SpotifyTrack) {
         let _ = oauth.client.put("\(URLs.user_library_url)?ids=\(track.trackID)", success: { response in
             if response.response.statusCode != 200 {
                 print("save: \(response.response.statusCode)")
@@ -324,7 +324,7 @@ class SpotifyManager {
         })
     }
     
-    func unsave(_ track: Track) {
+    func unsave(_ track: SpotifyTrack) {
         let _ = oauth.client.delete("\(URLs.user_library_url)?ids=\(track.trackID)", success: { response in
             if response.response.statusCode != 200 {
                 print("unsave: \(response.response.statusCode)")
@@ -396,7 +396,7 @@ class SpotifyManager {
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String:AnyObject]
             let tracksDict = jsonObject["items"] as! [[String:AnyObject]]
 
-            var tracks = [Track]()
+            var tracks = [SpotifyTrack]()
             for item in tracksDict {
                 if let trackObj = item["track"] as? [String:AnyObject] {
                     if let track = parseTrack(trackObj: trackObj) {
@@ -411,23 +411,20 @@ class SpotifyManager {
         }
     }
     
-    func parseTrack(trackObj: [String:AnyObject]) -> Track? {
+    func parseTrack(trackObj: [String:AnyObject]) -> SpotifyTrack? {
         let optUrlStr = (((trackObj["album"] as? [String:AnyObject])?["images"] as? [[String:AnyObject]])?.first)?["url"] as? String
-        if let title = trackObj["name"] as? String,
+        if
+            let title = trackObj["name"] as? String,
             let id = trackObj["id"] as? String,
             let artist = ((trackObj["artists"] as! [[String:AnyObject]])[0])["name"] as? String,
             let urlString = optUrlStr,
-            let url = URL(string: urlString) {
-            
-            return Track(dbID: "",
-                         title: title,
-                         artist: artist,
-                         trackID: id,
-                         imageURL: url,
-                         image: nil,
-                         preview: nil,
-                         duration: trackObj["duration_ms"] as? Int ?? 0,
-                         timestamp: Date.now())
+            let url = URL(string: urlString)
+        {
+            return SpotifyTrack(title: title,
+                                artist: artist,
+                                trackID: id,
+                                imageURL: url,
+                                duration: trackObj["duration_ms"] as? Int ?? 0)
         }
         return nil
     }
@@ -437,25 +434,23 @@ class SpotifyManager {
             let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as! [String:AnyObject]
             let tracksDict = (jsonObject["tracks"] as! [String:AnyObject])["items"] as! [[String:AnyObject]]
  
-            var tracks = [Track]()
+            var tracks = [SpotifyTrack]()
             for item in tracksDict {
                 let optUrlStr = (((item["album"] as? [String:AnyObject])?["images"] as? [[String:AnyObject]])?.first)?["url"] as? String
-                if let title = item["name"] as? String,
+                if 
+                    let title = item["name"] as? String,
                     let id = item["id"] as? String,
                     let artist = ((item["artists"] as! [[String:AnyObject]])[0])["name"] as? String,
                     let urlStr = optUrlStr,
-                    let url = URL(string: urlStr) {
+                    let url = URL(string: urlStr) 
+                {
                     
-                    //print(title, artist)
-                    let track = Track(dbID: "",
-                                      title: title,
-                                      artist: artist,
-                                      trackID: id,
-                                      imageURL: url,
-                                      image: nil,
-                                      preview: nil,
-                                      duration: item["duration_ms"] as? Int ?? 0,
-                                      timestamp: Date.now())
+
+                    let track = SpotifyTrack(title: title,
+                                             artist: artist,
+                                             trackID: id,
+                                             imageURL: url,
+                                             duration: item["duration_ms"] as? Int ?? 0)
                     tracks.append(track)
                 }
             }

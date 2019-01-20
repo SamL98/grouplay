@@ -21,12 +21,15 @@
 		B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */; };
 		B747DDED21344C2E001996D2 /* FirebaseManager+Current.swift in Sources */ = {isa = PBXBuildFile; fileRef = B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */; };
 		B747DDEF21344CA5001996D2 /* FirebaseManager+Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */; };
-		B747DDF121344D4C001996D2 /* FirebaseManager+JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = B747DDF021344D4C001996D2 /* FirebaseManager+JSON.swift */; };
 		B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */; };
 		B769DB691FDC687300DDD4BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */; };
 		B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */; };
 		B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6C1FDC694700DDD4BE /* Utility.swift */; };
 		B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = B769DB6E1FDC99B300DDD4BE /* Session.swift */; };
+		B76C9CD621EBC5EA0093711C /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76C9CD521EBC5EA0093711C /* Queue.swift */; };
+		B76C9CD821EBC6DA0093711C /* Member.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76C9CD721EBC6DA0093711C /* Member.swift */; };
+		B76C9CDA21EBC7460093711C /* MemberSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76C9CD921EBC7460093711C /* MemberSet.swift */; };
+		B76C9CDD21EBCF800093711C /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76C9CDC21EBCF800093711C /* UserStore.swift */; };
 		B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78A8DE42017E314006F936E /* QueueViewController.swift */; };
 		B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */; };
 		B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */; };
@@ -42,7 +45,7 @@
 		B7BB98FF1FD9B0D2007BDB0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B7BB98FE1FD9B0D2007BDB0B /* Assets.xcassets */; };
 		B7BB99021FD9B0D2007BDB0B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7BB99001FD9B0D2007BDB0B /* LaunchScreen.storyboard */; };
 		B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */; };
-		B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB990B1FD9B205007BDB0B /* Track.swift */; };
+		B7BB990C1FD9B205007BDB0B /* SpotifyTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB990B1FD9B205007BDB0B /* SpotifyTrack.swift */; };
 		BA34BD5F70514BD163F00ABE /* Pods_grouplay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72FD43446726ACEEE080A461 /* Pods_grouplay.framework */; };
 /* End PBXBuildFile section */
 
@@ -66,12 +69,15 @@
 		B70ADE1320A4EB9C00330A9C /* ArcLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArcLayer.swift; sourceTree = "<group>"; };
 		B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+Current.swift"; sourceTree = "<group>"; };
 		B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+Queue.swift"; sourceTree = "<group>"; };
-		B747DDF021344D4C001996D2 /* FirebaseManager+JSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+JSON.swift"; sourceTree = "<group>"; };
 		B769DB661FDC67E400DDD4BE /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
 		B769DB681FDC687300DDD4BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		B769DB6C1FDC694700DDD4BE /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		B769DB6E1FDC99B300DDD4BE /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		B76C9CD521EBC5EA0093711C /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		B76C9CD721EBC6DA0093711C /* Member.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Member.swift; sourceTree = "<group>"; };
+		B76C9CD921EBC7460093711C /* MemberSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberSet.swift; sourceTree = "<group>"; };
+		B76C9CDC21EBCF800093711C /* UserStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStore.swift; sourceTree = "<group>"; };
 		B78A8DE42017E314006F936E /* QueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewController.swift; sourceTree = "<group>"; };
 		B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowQRViewController.swift; sourceTree = "<group>"; };
 		B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRViewController.swift; sourceTree = "<group>"; };
@@ -89,7 +95,7 @@
 		B7BB99011FD9B0D2007BDB0B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B7BB99031FD9B0D2007BDB0B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyManager.swift; sourceTree = "<group>"; };
-		B7BB990B1FD9B205007BDB0B /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		B7BB990B1FD9B205007BDB0B /* SpotifyTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyTrack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,9 +155,17 @@
 				B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */,
 				B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */,
 				B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */,
-				B747DDF021344D4C001996D2 /* FirebaseManager+JSON.swift */,
 			);
 			path = Firebase;
+			sourceTree = "<group>";
+		};
+		B76C9CDB21EBCF6A0093711C /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				B70ADE0520A20E0600330A9C /* SessionStore.swift */,
+				B76C9CDC21EBCF800093711C /* UserStore.swift */,
+			);
+			path = Stores;
 			sourceTree = "<group>";
 		};
 		B78A8DDE2017A02D006F936E /* Controllers */ = {
@@ -186,7 +200,6 @@
 			children = (
 				B747DDEB21344C1D001996D2 /* Firebase */,
 				B7BB99091FD9B1C4007BDB0B /* SpotifyManager.swift */,
-				B70ADE0520A20E0600330A9C /* SessionStore.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -194,9 +207,12 @@
 		B78A8DE12017A044006F936E /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				B7BB990B1FD9B205007BDB0B /* Track.swift */,
+				B7BB990B1FD9B205007BDB0B /* SpotifyTrack.swift */,
 				B7A3F0C421E6BF7F00AA3BA4 /* QueuedTrack.swift */,
 				B769DB6E1FDC99B300DDD4BE /* Session.swift */,
+				B76C9CD721EBC6DA0093711C /* Member.swift */,
+				B76C9CD921EBC7460093711C /* MemberSet.swift */,
+				B76C9CD521EBC5EA0093711C /* Queue.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -223,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */,
+				B76C9CDB21EBCF6A0093711C /* Stores */,
 				B78A8DE12017A044006F936E /* Models */,
 				B78A8DE02017A038006F936E /* Managers */,
 				B78A8DDF2017A033006F936E /* Views */,
@@ -365,6 +382,7 @@
 			files = (
 				B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */,
 				B70ADE0F20A4A30200330A9C /* MainViewController+API.swift in Sources */,
+				B76C9CD821EBC6DA0093711C /* Member.swift in Sources */,
 				B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */,
 				B70ADE02209F69BD00330A9C /* BridgeViewController.m in Sources */,
 				B747DDED21344C2E001996D2 /* FirebaseManager+Current.swift in Sources */,
@@ -374,10 +392,12 @@
 				B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */,
 				B70ADE0920A4A16900330A9C /* MainViewController+Playback.swift in Sources */,
 				B747DDEF21344CA5001996D2 /* FirebaseManager+Queue.swift in Sources */,
+				B76C9CDA21EBC7460093711C /* MemberSet.swift in Sources */,
 				B70ADE0D20A4A2B700330A9C /* MainViewController+SearchBar.swift in Sources */,
 				B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */,
 				B7A3F0C721E6C9C800AA3BA4 /* InfoViewController.swift in Sources */,
 				B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */,
+				B76C9CD621EBC5EA0093711C /* Queue.swift in Sources */,
 				B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */,
 				B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */,
 				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
@@ -386,10 +406,10 @@
 				B7BB98FD1FD9B0D2007BDB0B /* grouplay.xcdatamodeld in Sources */,
 				B7A3F0C521E6BF7F00AA3BA4 /* QueuedTrack.swift in Sources */,
 				B769DB671FDC67E500DDD4BE /* LaunchViewController.swift in Sources */,
-				B747DDF121344D4C001996D2 /* FirebaseManager+JSON.swift in Sources */,
 				B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */,
-				B7BB990C1FD9B205007BDB0B /* Track.swift in Sources */,
+				B7BB990C1FD9B205007BDB0B /* SpotifyTrack.swift in Sources */,
 				B7A3F0C321E6B5E000AA3BA4 /* QueueTableViewCell.swift in Sources */,
+				B76C9CDD21EBCF800093711C /* UserStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -82,8 +82,8 @@ class ScanQRViewController: UIViewController, AVCaptureMetadataOutputObjectsDele
         session.startRunning()
     }
     
-    func parseQRCode(_ code: String) {
-        ((presentingViewController as? UINavigationController)?.viewControllers.first as? LaunchViewController)?.code = code
+    func parseQRCode(_ name: String) {
+        ((presentingViewController as? UINavigationController)?.viewControllers.first as? LaunchViewController)?.name = name
         dismiss(animated: true, completion: nil)
     }
     

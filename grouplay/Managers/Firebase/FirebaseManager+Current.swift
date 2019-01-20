@@ -12,100 +12,37 @@ import FirebaseDatabase
 
 extension FirebaseManager {
     
-    // Observe the realtime current track in the database. Only called if the session is not owned by the current user.
-    func fetchCurrent(isOwner: Bool, completion: @escaping (QueuedTrack?, NSError?) -> Void) {
-        if sessRef == nil {
-            print("sess ref nil")
-            completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
-            return
-        }
-        
-        let comp: (DataSnapshot) -> Void = { snap in
-            guard let val = snap.value as? [String:AnyObject] else {
+    func observeCurrent() {
+        let handler: (DataSnapshot) -> Void = { snapshot in
+            guard
+                let currentJSON = snapshot.value as? [String:AnyObject]
+            else
+            {
+                print("Error: could not parse snapshot value from current observe")
                 return
             }
+            
+            let uuid = snapshot.key
             
             guard
-                let dbID = val["dbID"] as? String,
-                let id = val["trackID"] as? String,
-                let title = val["title"] as? String,
-                let artist = val["artist"] as? String,
-                let imgUrl = val["imageURL"] as? String,
-                let duration = val["duration"] as? Int,
-                let timestamp = val["timestamp"] as? UInt64 else {
-                    
-                    completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
-                    return
-            }
-            
-            if let curr = SessionStore.session?.current?.track {
-                guard curr.trackID != id else { return }
-            }
-            
-            let track = QueuedTrack(dbID: dbID,
-                                    title: title,
-                                    artist: artist,
-                                    trackID: id,
-                                    imageURL: URL(string: imgUrl)!,
-                                    image: nil,
-                                    preview: nil,
-                                    duration: duration,
-                                    timestamp: timestamp,
-                                    queuer: val["queuer"] as? String ?? "username")
-        
-            completion(track,  nil)
-        }
-        
-        if isOwner {
-            sessRef?.child("current").observeSingleEvent(of: .value,
-                                                        with: comp,
-                                                        withCancel: { err in
-                                                            print("could not fetch current (firebase): \(err)")
-                                                            completion(nil, NSError(domain: "current-fetch", code: 4234, userInfo: nil))
-            })
-        } else {
-            sessRef?.child("current").observe(.value,
-                                                with: comp,
-                                                withCancel: { err in
-                                                    print("could not fetch current (firebase): \(err)")
-                                                    completion(nil, NSError(domain: "current-fetch", code: 4324, userInfo: nil))
-            })
-        }
-    }
-    
-    // Set the current track in the database. Only called if the session is owned by the current user.
-    func setCurrent(_ track: QueuedTrack) {
-        sessRef?.child("current").setValue([
-            "trackID": track.trackID,
-            "dbID": track.dbID,
-            "title": track.title,
-            "artist": track.artist,
-            "imageURL": "\(track.albumImageURL)",
-            "duration": track.duration,
-            "timestamp": Date.now(),
-            "queuer": track.queuer
-            ])
-    }
-    
-    func observePaused(sess: Session, eventOccurred: @escaping (Bool) -> Void) {
-        guard sessRef != nil else {
-            print("sess ref is nil")
-            eventOccurred(false)
-            return
-        }
-        
-        sessRef!.child("paused").observe(.value, with: { snap in
-            guard let paused = snap.value as? Bool else {
-                print("Could not parse value of paused from snapshot: \(String(describing: snap.value))")
+                let current = QueuedTrack.marshal(uuid: uuid, json: currentJSON)
+            else
+            {
+                print("Error: Could not marshal current JSON")
                 return
             }
             
-            eventOccurred(paused)
-            return
-        })
+            SessionStore.current?.currentSet(current)
+        }
+        
+        sessRef?.child("current").observe(.childAdded,
+                                          with: handler)
     }
-    
-    func setPaused(paused: Bool) {
-        sessRef?.child("paused").setValue(paused)
+
+    func setCurrent(_ track: QueuedTrack) {
+        let currentJSON = [
+            track.uuid: track.unmarshal() as AnyObject
+        ]
+        sessRef?.child("current").setValue(currentJSON)
     }
 }

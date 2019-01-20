@@ -15,7 +15,7 @@ class TrackTableViewCell: UITableViewCell {
     @IBOutlet weak var artistLabel: UILabel!
     @IBOutlet weak var queueButton: UIButton!
     
-    var track: Track!
+    var track: SpotifyTrack!
     var queuedTrack: QueuedTrack?
     
     var dontDownload = false {
@@ -27,10 +27,6 @@ class TrackTableViewCell: UITableViewCell {
     }
     var imageURL: URL? {
         didSet {
-            guard track.image == nil else {
-                iconView.image = track.image
-                return
-            }
             if let url = imageURL, !dontDownload {
                 loadImage(from: url)
             }
@@ -39,12 +35,10 @@ class TrackTableViewCell: UITableViewCell {
     var imageDownloadTask: URLSessionDataTask?
     
     var isOwner = false
+
     var queued = false {
         didSet {
             if queued {
-                queuedTrack = QueuedTrack.from(track)
-                queuedTrack?.queuer = UserDefaults.standard.string(forKey: "user_id") ?? "username"
-                
                 queueButton.setTitle("", for: .normal)
                 queueButton.setImage(UIImage(named: "001-checkmark"), for: .normal)
             } else {
@@ -97,19 +91,13 @@ class TrackTableViewCell: UITableViewCell {
     
     @IBAction func enqueue(sender: UIButton) {
         queued = !queued
+        
         if queued {
-            let dbID = FirebaseManager.shared.enqueue(track, pending: !self.isOwner)
-            track.dbID = dbID
-            
-            if isOwner {
-                SessionStore.session!.queue.append(queuedTrack!)
-            }
+            SessionStore.current?.addTrack(track)
+            queuedTrack = SessionStore.current?.queue.tracks.last
         } else {
             if let qt = queuedTrack {
-                FirebaseManager.shared.dequeue(qt, pending: false)
-                if isOwner {
-                    SessionStore.session!.queue = SessionStore.session!.queue.filter({ $0.dbID != track.dbID })
-                }
+                SessionStore.current?.removeTrack(qt)
             }
         }
     }

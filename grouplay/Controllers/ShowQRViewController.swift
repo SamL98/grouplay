@@ -15,9 +15,9 @@ class ShowQRViewController: UIViewController {
         super.viewDidLoad()
 
         guard let imageView = view.viewWithTag(20) as? UIImageView else { return }
-        guard let sessCode = UserDefaults.standard.string(forKey: "currCode") else { return }
+        guard let sessName = UserDefaults.standard.string(forKey: "currName") else { return }
         
-        var qrCode = QRCode(sessCode.data(using: .utf8)!)
+        var qrCode = QRCode(sessName.data(using: .utf8)!)
         qrCode.size = imageView.frame.size
         imageView.image = qrCode.image
     }

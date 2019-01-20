@@ -10,21 +10,20 @@ import UIKit
 
 extension MainViewController {
     
-    func observeQueue() {
-        guard let sess = SessionStore.session else { return }
-        FirebaseManager.shared.observeQueue(sess: sess, eventOccurred: { needsUpdate in
-            if needsUpdate { NotificationCenter.default.post(name: Notification.Name(rawValue: "queue-changed"), object: nil) }
-        })
-    }
-    
     func fetchLibrary() {
-        //guard offsetCount <= 10 else { return }
         SpotifyManager.shared.fetchLibrary(extraParameters: ["offset": (50 * offsetCount) as AnyObject], onCompletion: { (optTracksArr, error) in
-            guard error == nil else {
+            guard 
+                error == nil 
+            else 
+            {
                 print("fetch library \(error!)")
                 return
             }
-            guard let tracksArr = optTracksArr else {
+
+            guard 
+                let tracksArr = optTracksArr 
+            else 
+            {
                 print("tracks arr is nil")
                 return
             }
@@ -42,36 +41,5 @@ extension MainViewController {
             }
         })
     }
-    
-    // Fetch curr will call once is isOwner, listen otherwise
-    func fetchCurr() {
-        FirebaseManager.shared.fetchCurrent(isOwner: isOwner) { track, err in
-            self.parseCurr(track: track, err: err)
-        }
-    }
-    
-    func parseCurr(track: QueuedTrack?, err: NSError?) {
-        guard err == nil else {
-            print("parsing curr: \(err!)")
-            self.currViewDisplayed = true
-            self.hideCurrView()
-            return
-        }
-        
-        guard track != nil else {
-            self.hideCurrView()
-            return
-        }
-        
-        DispatchQueue.main.async {
-            self.current = track!
-        }
-    }
-    
-    func observePaused() {
-        guard let sess = SessionStore.session else { return }
-        FirebaseManager.shared.observePaused(sess: sess, eventOccurred: { paused in
-            self.paused = paused
-        })
-    }
+
 }

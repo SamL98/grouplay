@@ -28,7 +28,7 @@ extension MainViewController {
         }
     }
     
-    func checkForShowNoMatchLabel(trackArray: [Track]) {
+    func checkForShowNoMatchLabel(trackArray: [SpotifyTrack]) {
         hideNoMatchLabel()
         if trackArray.count == 0 {
             showNoMatchLabel()
@@ -122,7 +122,7 @@ extension MainViewController {
         }
     }
     
-    func filterTracks(text: String, tracksToFilter: [Track]) -> [Track] {
+    func filterTracks(text: String, tracksToFilter: [SpotifyTrack]) -> [SpotifyTrack] {
         return tracksToFilter.filter{
             $0.title.lowercased().contains(text.lowercased()) || $0.artist.lowercased().contains(text.lowercased())
         }

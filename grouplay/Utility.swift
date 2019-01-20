@@ -57,6 +57,10 @@ class Utility {
         return "\(minutes):\(secondStr)"
     }
     
+    static func sendNotification(named name: String) {
+        NotificationCenter.default.post(name: Notification.Name(name), object: nil)
+    }
+    
 }
 
 extension Date {

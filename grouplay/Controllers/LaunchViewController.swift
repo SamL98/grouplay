@@ -13,7 +13,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var tableView: UITableView!
     
     var isOwner = false
-    var code: String?
+    var name: String?
     
     var recents = [String]() {
         didSet {
@@ -23,11 +23,25 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         recents = UserDefaults.standard.array(forKey: "recents") as? [String] ?? []
+
+        guard
+            let uid = UserDefaults.standard.string(forKey: "uid"),
+            let username = UserDefaults.standard.string(forKey: "username")
+        else
+        {
+            print("No uid in UserDefaults")
+            return
+        }
+
+        let hasPremium = UserDefaults.standard.bool(forKey: "hasPremium")
+        let currentUser = Member(uid: uid, username: username, hasPremium: hasPremium)
+        UserStore.current = currentUser
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        if code != nil { join(code: code!) }
+        if name != nil { join(name: name!) }
     }
     
     func displayError(title: String, message: String) {
@@ -45,7 +59,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func displayJoinPrompt(completion: @escaping (String) -> Void) {
-        let alert = UIAlertController(title: "Join", message: "Enter the code of the session to join", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Join", message: "Enter the name of the session to join", preferredStyle: .alert)
         alert.addTextField(configurationHandler: nil)
         alert.addAction(UIAlertAction(title: "Go", style: .default, handler: { _ in
             guard let textfield = alert.textFields?.first else {
@@ -80,7 +94,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        join(code: recents[indexPath.row])
+        join(name: recents[indexPath.row])
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -89,32 +103,28 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     @IBAction func joinSession(_ sender: UIButton) {
-        displayJoinPrompt { code in
-            self.join(code: code)
+        displayJoinPrompt { name in
+            self.join(name: name)
         }
     }
     
-    func join(code: String) {
-        FirebaseManager.shared.joinSession(code: code, completion: { (sess, errStr) in
-            guard errStr == nil else {
-                print(errStr!)
+    func join(name: String) {
+        FirebaseManager.shared.joinSession(name: name, completion: { errStr in
+            if let error = errStr
+            {
+                print(error)
                 return
             }
-
-            UserDefaults.standard.set(code, forKey: "currCode")
-            SessionStore.session = sess
             
-            FirebaseManager.shared.enter()
-            
-            if !self.recents.contains(code) {
-                self.recents.append(code)
+            if !self.recents.contains(name) {
+                self.recents.append(name)
                 UserDefaults.standard.set(self.recents, forKey: "recents")
             }
             
+            UserDefaults.standard.set(name, forKey: "currName")
+            
             DispatchQueue.main.async {
-                if sess != nil && sess!.owner == UserDefaults.standard.string(forKey: "uid")! {
-                    self.isOwner = true
-                }
+                self.isOwner = UserStore.current?.isOwner() ?? false
                 self.performSegue(withIdentifier: "to search", sender: nil)
             }
         })
@@ -122,38 +132,25 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBAction func createSession(_ sender: UIButton) {
         FirebaseManager.shared.createSession { (code, errStr) in
-            guard errStr == nil else {
+            guard 
+                errStr == nil 
+            else 
+            {
                 print(errStr!)
-                DispatchQueue.main.async {
-                    self.displayCreateError()
-                }
+                DispatchQueue.main.async { self.displayCreateError() }
                 return
             }
-            guard code != nil else {
-                print("code is nil from create")
-                DispatchQueue.main.async {
-                    self.displayCreateError()
-                }
+
+            if code == nil {
+                print("Code is null from create")
+                DispatchQueue.main.async { self.displayCreateError() }
                 return
             }
-            guard let uid = UserDefaults.standard.string(forKey: "uid") else {
-                DispatchQueue.main.async {
-                    self.displayCreateError()
-                }
-                return
-            }
-            
-            let username = (UserDefaults.standard.string(forKey: "username") ?? "username") as AnyObject
-            let hasPremium = UserDefaults.standard.bool(forKey: "hasPremium") as AnyObject
-            let memberDict = [
-                uid: ["username": username, "has_premium": hasPremium]
-            ]
-            
-            SessionStore.session = Session(id: code!, name: code!, owner: uid, members: memberDict, queue: [])
+
             self.recents.append(code!)
             
             UserDefaults.standard.set(self.recents, forKey: "recents")
-            UserDefaults.standard.set(code!, forKey: "currCode")
+            UserDefaults.standard.set(code!, forKey: "currName")
             
             DispatchQueue.main.async {
                 self.isOwner = true
@@ -187,7 +184,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         print("perform segue")
         print(identifier)
         if identifier == "to" {
-            return SessionStore.session != nil
+            return SessionStore.current != nil
         }
         return true
     }
