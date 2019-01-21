@@ -34,6 +34,21 @@ class InfoViewController: UIViewController, UITableViewDataSource, UITextFieldDe
         
         textField.isEnabled = canEdit
         textField.text = sess.name
+        
+        observeMemberChange()
+    }
+    
+    func observeMemberChange() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(membersChanged),
+                                               name: Notification.Name("members-changed"),
+                                               object: nil)
+    }
+    
+    @objc func membersChanged() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {

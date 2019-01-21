@@ -13,6 +13,8 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
     @IBOutlet weak var tableView: UITableView!
 
     var canEdit = false
+    
+    var prevRightButtonItems: [UIBarButtonItem]?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +31,28 @@ class QueueViewController: UIViewController, UITableViewDataSource, UITableViewD
         canEdit = (UserStore.current?.uid ?? "") == session.owner
 
         observeDatabase()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        prevRightButtonItems = navigationController?.navigationBar.topItem?.rightBarButtonItems
+        
+        let buttonItem = UIBarButtonItem(title: "Info",
+                                         style: .plain,
+                                         target: self,
+                                         action: #selector(showInfo))
+        navigationController?.navigationBar.topItem?.rightBarButtonItems = [buttonItem]
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        navigationController?.navigationBar.topItem?.rightBarButtonItems = prevRightButtonItems
+    }
+    
+    @objc func showInfo() {
+        performSegue(withIdentifier: "to info", sender: nil)
     }
 
     func observeDatabase() {

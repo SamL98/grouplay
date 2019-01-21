@@ -44,7 +44,7 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     // MARK: - Ad Properties
     
-    let adRowInterval = 12
+    let adRowInterval = 15
     
     // MARK: - Track Arrays
     

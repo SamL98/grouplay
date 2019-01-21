@@ -168,6 +168,7 @@ extension MainViewController {
 
         SessionStore.current?.prepend(current)
         SessionStore.current?.setCurrent(prevTrack)
+        updateCurrentUI()
 
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + prevTrack.trackID, 
                                                     startingWith: 0, 

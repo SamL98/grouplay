@@ -12,7 +12,9 @@ extension MainViewController {
     
     func synchronizeWithBackend() {
         UserStore.current?.joinCurrentSession()
+        
         SessionStore.current?.syncQueue()
+        SessionStore.current?.syncMembers()
         
         if !(UserStore.current?.isOwner() ?? false)
         {

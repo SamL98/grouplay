@@ -115,7 +115,7 @@ class FirebaseManager {
         })
     }
     
-    func updateId(with name: String) {
+    func updateId(with name: String, oldName: String) {
         guard
             let sess = SessionStore.current
         else
@@ -124,10 +124,9 @@ class FirebaseManager {
             return
         }
         
-        dbRef.child("session_names").child(sess.name).removeValue()
+        dbRef.child("session_names").child(oldName).removeValue()
         dbRef.child("session_names").child(name).setValue(sess.id)
         sessRef?.child("name").setValue(name)
-        sess.name = name
     }
     
 }

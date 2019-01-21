@@ -123,4 +123,38 @@ extension MainViewController {
         }
     }
     
+    func showEnqueueCompletionView() {
+        showQueueActionCompletionView(image: UIImage(named: "checkmark")!)
+    }
+    
+    func showDequeueCompletionView() {
+        showQueueActionCompletionView(image: UIImage(named: "close")!)
+    }
+    
+    func showQueueActionCompletionView(image: UIImage) {
+        let size: CGFloat = 75.0
+        let completionView = UIView(frame: CGRect(x: view.bounds.midX-size/2.0, y: view.bounds.midY-size/2.0, width: size, height: size))
+        completionView.backgroundColor = UIColor.lightGray
+        completionView.layer.cornerRadius = 5.0
+        completionView.alpha = 0.65
+        
+        let padding: CGFloat = 15.0
+        let imgView = UIImageView(frame: CGRect(x: padding, y: padding, width: size - 2*padding, height: size - 2*padding))
+        imgView.backgroundColor = UIColor.clear
+        imgView.image = image
+        
+        completionView.addSubview(imgView)
+        view.addSubview(completionView)
+        
+        Timer(fire: Date(timeIntervalSinceNow: 3.0), interval: 0.0, repeats: false, block: { timer in
+            UIView.animate(withDuration: 1.5, animations: {
+                completionView.alpha = 0.0
+            }, completion: { _ in
+                completionView.removeFromSuperview()
+            })
+            
+            timer.invalidate()
+        }).fire()
+    }
+    
 }

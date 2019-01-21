@@ -41,6 +41,7 @@
 		B7B7E10621F52D8F004926CD /* AlbumArtCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B7E10521F52D8F004926CD /* AlbumArtCache.swift */; };
 		B7B7E10821F52FA9004926CD /* MainViewController+Scroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B7E10721F52FA9004926CD /* MainViewController+Scroll.swift */; };
 		B7B7E10A21F558DE004926CD /* MainViewController+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B7E10921F558DE004926CD /* MainViewController+UI.swift */; };
+		B7B7E10C21F65C97004926CD /* FirebaseManager+Members.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B7E10B21F65C97004926CD /* FirebaseManager+Members.swift */; };
 		B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */; };
 		B7BB98F71FD9B0D2007BDB0B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */; };
 		B7BB98FA1FD9B0D2007BDB0B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B7BB98F81FD9B0D2007BDB0B /* Main.storyboard */; };
@@ -92,6 +93,7 @@
 		B7B7E10521F52D8F004926CD /* AlbumArtCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumArtCache.swift; sourceTree = "<group>"; };
 		B7B7E10721F52FA9004926CD /* MainViewController+Scroll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+Scroll.swift"; sourceTree = "<group>"; };
 		B7B7E10921F558DE004926CD /* MainViewController+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MainViewController+UI.swift"; sourceTree = "<group>"; };
+		B7B7E10B21F65C97004926CD /* FirebaseManager+Members.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FirebaseManager+Members.swift"; sourceTree = "<group>"; };
 		B7BB98F11FD9B0D2007BDB0B /* grouplay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = grouplay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BB98F41FD9B0D2007BDB0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B7BB98F61FD9B0D2007BDB0B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -147,11 +149,11 @@
 			isa = PBXGroup;
 			children = (
 				B79FA7C21FDAF0E600A00497 /* MainViewController.swift */,
-				B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */,
 				B70ADE0820A4A16900330A9C /* MainViewController+Playback.swift */,
 				B70ADE0A20A4A25B00330A9C /* MainViewController+TableView.swift */,
 				B7B7E10721F52FA9004926CD /* MainViewController+Scroll.swift */,
 				B70ADE0E20A4A30200330A9C /* MainViewController+API.swift */,
+				B70ADE0C20A4A2B700330A9C /* MainViewController+SearchBar.swift */,
 				B7B7E10921F558DE004926CD /* MainViewController+UI.swift */,
 			);
 			path = Main;
@@ -163,6 +165,7 @@
 				B769DB6A1FDC68F200DDD4BE /* FirebaseManager.swift */,
 				B747DDEC21344C2E001996D2 /* FirebaseManager+Current.swift */,
 				B747DDEE21344CA5001996D2 /* FirebaseManager+Queue.swift */,
+				B7B7E10B21F65C97004926CD /* FirebaseManager+Members.swift */,
 			);
 			path = Firebase;
 			sourceTree = "<group>";
@@ -411,6 +414,7 @@
 				B76C9CD621EBC5EA0093711C /* Queue.swift in Sources */,
 				B7BB98F51FD9B0D2007BDB0B /* AppDelegate.swift in Sources */,
 				B70ADE1420A4EB9C00330A9C /* ArcLayer.swift in Sources */,
+				B7B7E10C21F65C97004926CD /* FirebaseManager+Members.swift in Sources */,
 				B769DB6F1FDC99B300DDD4BE /* Session.swift in Sources */,
 				B70ADE0620A20E0600330A9C /* SessionStore.swift in Sources */,
 				B70ADE0B20A4A25B00330A9C /* MainViewController+TableView.swift in Sources */,

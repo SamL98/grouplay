@@ -11,6 +11,10 @@ import GoogleMobileAds
 
 extension MainViewController {
     
+    func isIndexPathAnAd(_ indexPath: IndexPath) -> Bool {
+        return indexPath.row > 0 && indexPath.row % adRowInterval == 0
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -60,20 +64,22 @@ extension MainViewController {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if
-            indexPath.row > 0 &&
-            indexPath.row % adRowInterval == 0
+        if isIndexPathAnAd(indexPath)
         {
             return adCell(tableView, at: indexPath)
         }
         else
         {
-            return trackCell(tableView, at: indexPath)
+            let row = indexPath.row - Int(floor(Double(indexPath.row) / Double(adRowInterval)))
+            return trackCell(tableView, at: IndexPath(row: row, section: indexPath.section))
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard isOwner else { return }
+        if !isOwner || isIndexPathAnAd(indexPath)
+        {
+            return
+        }
 
         SpotifyManager.shared.player.playSpotifyURI("spotify:track:" + tracks[indexPath.row].trackID, 
                                                     startingWith: 0, 
@@ -95,6 +101,11 @@ extension MainViewController {
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        if isIndexPathAnAd(indexPath)
+        {
+            return nil
+        }
+        
         guard
             let sess = SessionStore.current,
             let me = UserStore.current
@@ -119,7 +130,12 @@ extension MainViewController {
                     print("Could not get queued track from added array")
                     return
                 }
+                
                 SessionStore.current?.removeTrack(qt)
+                
+                DispatchQueue.main.async {
+                    self.showDequeueCompletionView()
+                }
             }
         }
         else
@@ -128,6 +144,10 @@ extension MainViewController {
             title = "Add"
             handler = { (_, path) in
                 SessionStore.current?.addTrack(self.tracks[path.row])
+                
+                DispatchQueue.main.async {
+                    self.showEnqueueCompletionView()
+                }
             }
         }
         

@@ -125,8 +125,9 @@ class Session {
     // MARK: - Name
     
     func updateName(_ name: String) {
+        let oldName = self.name
         self.name = name
-        FirebaseManager.shared.updateId(with: name)
+        FirebaseManager.shared.updateId(with: name, oldName: oldName)
     }
     
     
@@ -140,6 +141,22 @@ class Session {
     func removeMember(_ member: Member) {
         members.remove(member)
         FirebaseManager.shared.removeMember(member)
+    }
+    
+    func memberAdded(_ member: Member) {
+        if !members.members.contains(where: { $0.uid == member.uid })
+        {
+            members.add(member)
+            Utility.sendNotification(named: "members-changed")
+        }
+    }
+    
+    func memberRemoved(_ member: Member) {
+        if members.members.contains(where: { $0.uid == member.uid })
+        {
+            members.remove(member)
+            Utility.sendNotification(named: "members-changed")
+        }
     }
     
     // MARK: - Current
@@ -208,6 +225,10 @@ class Session {
     
     func syncCurrent() {
         FirebaseManager.shared.observeCurrent()
+    }
+    
+    func syncMembers() {
+        FirebaseManager.shared.observeMembers()
     }
 
 }

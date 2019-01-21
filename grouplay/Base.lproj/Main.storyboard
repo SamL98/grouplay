@@ -361,7 +361,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AIN-2E-tdE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4253.6000000000004" y="-567.16641679160421"/>
+            <point key="canvasLocation" x="4959" y="-548"/>
         </scene>
         <!--Main View Controller-->
         <scene sceneID="KJ0-Wf-ahY">
@@ -565,11 +565,6 @@
                             </connections>
                         </barButtonItem>
                         <rightBarButtonItems>
-                            <barButtonItem title="Info" id="5p5-yu-w6G">
-                                <connections>
-                                    <segue destination="35G-Fr-wh7" kind="show" id="o1D-xu-j1T"/>
-                                </connections>
-                            </barButtonItem>
                             <barButtonItem title="Queue" id="Jbn-Vq-Ct7">
                                 <connections>
                                     <segue destination="aBj-dL-vUS" kind="show" id="INi-z7-Pkw"/>
@@ -692,6 +687,7 @@
                     </view>
                     <connections>
                         <outlet property="tableView" destination="d8R-uw-C0b" id="GkH-8v-JSO"/>
+                        <segue destination="35G-Fr-wh7" kind="show" identifier="to info" id="t7o-Jg-RKy"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="awO-A9-XCc" userLabel="First Responder" sceneMemberID="firstResponder"/>

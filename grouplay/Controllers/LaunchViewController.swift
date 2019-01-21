@@ -12,6 +12,10 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var tableView: UITableView!
     
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     var isOwner = false
     var name: String?
     
@@ -130,6 +134,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
             self.recentNames[self.recentCodes.firstIndex(where: { $0 == code })!] = sess.name
             self.recents[code] = sess.name
             UserDefaults.standard.set(self.recents, forKey: "recents")
+            self.tableView.reloadData()
             
             UserDefaults.standard.set(self.name, forKey: "currName")
             
@@ -155,10 +160,7 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
             }
             
             if !self.recentNames.contains(name) {
-                self.recents[code!] = name
-                print(self.recents, name)
-                UserDefaults.standard.set(self.recents, forKey: "recents")
-                self.tableView.reloadData()
+                self.addToRecents(code: code!, name: name)
             }
             
             UserDefaults.standard.set(self.name, forKey: "currName")
@@ -187,10 +189,8 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
                 return
             }
 
-            self.recentNames.append(code!)
-            
-            UserDefaults.standard.set(self.recentNames, forKey: "recents")
             UserDefaults.standard.set(code!, forKey: "currName")
+            self.addToRecents(code: code!, name: code!)
             
             DispatchQueue.main.async {
                 self.isOwner = true
@@ -206,17 +206,21 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         var actions = [UITableViewRowAction]()
         let remove = UITableViewRowAction(style: .destructive, title: "Remove", handler: { _, indexPath in
+            _ = self.recents.removeValue(forKey: self.recentNames[indexPath.row])
             self.recentNames.remove(at: indexPath.row)
+            self.recentCodes.remove(at: indexPath.row)
             self.tableView.reloadData()
-            UserDefaults.standard.set(self.recentNames, forKey: "recents")
+            UserDefaults.standard.set(self.recents, forKey: "recents")
         })
         actions.append(remove)
         return actions
     }
     
     @IBAction func deleteAll(sender: UIButton) {
-        UserDefaults.standard.set([], forKey: "recents")
+        UserDefaults.standard.set([:], forKey: "recents")
         self.recentNames = []
+        self.recentCodes = []
+        self.recents = [:]
         tableView.reloadData()
     }
     
@@ -235,8 +239,14 @@ class LaunchViewController: UIViewController, UITableViewDataSource, UITableView
         }
     }
     
-    override var prefersStatusBarHidden: Bool {
-        return true
+    func addToRecents(code: String, name: String) {
+        recents[code] = name
+        UserDefaults.standard.set(recentNames, forKey: "recents")
+        
+        recentNames.append(name)
+        recentCodes.append(code)
+        
+        tableView.reloadData()
     }
     
 }
