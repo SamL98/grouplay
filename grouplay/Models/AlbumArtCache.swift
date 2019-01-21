@@ -73,22 +73,7 @@ class AlbumArtCache {
         self.cache.countLimit = 20
     }
     
-    // MARK: - Loading / Cancelling
-    
-    func cancelDownload(for track: SpotifyTrack) {
-        let trackID = NSString(string: track.trackID)
-        
-        guard
-            let download = downloads[trackID]
-        else
-        {
-            print("No corresponding download for track ID: \(trackID)")
-            return
-        }
-        
-        download.cancel()
-        downloads.removeValue(forKey: trackID)
-    }
+    // MARK: - Loading
     
     private func loadImage(_ trackID: NSString, from url: URL, completion: @escaping (UIImage) -> Void) {
         if let img = cache.object(forKey: trackID)
@@ -99,7 +84,10 @@ class AlbumArtCache {
 
         let dataTask = URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) in
             guard error == nil else {
-                print(error!)
+                if (error! as NSError).code != -999
+                {
+                    print(error!)
+                }
                 return
             }
             guard (response as! HTTPURLResponse).statusCode == 200 else {
@@ -132,6 +120,29 @@ class AlbumArtCache {
     func loadImage(for track: SpotifyTrack, completion: @escaping (UIImage) -> Void) {
         let trackID = NSString(string: track.trackID)
         loadImage(trackID, from: track.albumImageURL, completion: completion)
+    }
+    
+    // MARK - Cancelling
+    
+    func cancelDownload(for track: SpotifyTrack) {
+        let trackID = NSString(string: track.trackID)
+        
+        guard
+            let download = downloads[trackID]
+            else
+        {
+            return
+        }
+        
+        download.cancel()
+        downloads.removeValue(forKey: trackID)
+    }
+    
+    func cancelAllDownloads() {
+        for (_, download) in downloads {
+            download.cancel()
+        }
+        downloads = [NSString:Downloader]()
     }
     
 }

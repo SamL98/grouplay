@@ -10,13 +10,36 @@ import UIKit
 
 extension MainViewController {
     
+    func synchronizeWithBackend() {
+        UserStore.current?.joinCurrentSession()
+        SessionStore.current?.syncQueue()
+        
+        if !(UserStore.current?.isOwner() ?? false)
+        {
+            SessionStore.current?.syncCurrent()
+        }
+        else
+        {
+            updateCurrentUI()
+        }
+        
+        observeDatabase()
+    }
+    
+    func observeDatabase() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(updateCurrentUI),
+                                               name: Notification.Name("current-changed"),
+                                               object: nil)
+    }
+    
     func fetchLibrary() {
         SpotifyManager.shared.fetchLibrary(extraParameters: ["offset": (50 * offsetCount) as AnyObject], onCompletion: { (optTracksArr, error) in
             guard 
                 error == nil 
             else 
             {
-                print("fetch library \(error!)")
+                print("Fetch library \(error!)")
                 return
             }
 
@@ -24,20 +47,25 @@ extension MainViewController {
                 let tracksArr = optTracksArr 
             else 
             {
-                print("tracks arr is nil")
+                print("Tracks arr is nil")
                 return
             }
 
             self.library.append(contentsOf: tracksArr)
-            
             self.offsetCount += 1
-            self.fetchLibrary()
             
-            if !self.isSearching && (self.searchBar.text == nil || self.searchBar.text! == "") {
+            if !self.isSearching && self.searchInputText == ""
+            {
                 self.tracks = self.library
+                
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
+            }
+            
+            if tracksArr.count == 50
+            {
+                self.fetchLibrary()
             }
         })
     }

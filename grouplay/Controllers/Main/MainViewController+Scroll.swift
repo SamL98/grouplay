@@ -19,10 +19,15 @@ extension MainViewController {
     //
     // 3. When dragging starts, post the `scrolling-started` notification to suspend any download tasks.
     //
-    // 4. Normally, when 
+    // 4. Normally, when fast scrolling, the scroll view will need to decelerate, in which case once that starts, post `scrolling-stopped` to resume download tasks.
+    //
+    // 5. If more precise scrolling is executed, the same tasks can be executed when dragging ends iff there is no deceleration
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        AlbumArtCache.shared.cancelDownload(for: tracks[indexPath.row])
+        if scrolling
+        {
+            AlbumArtCache.shared.cancelDownload(for: tracks[indexPath.row])
+        }
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
@@ -36,7 +41,8 @@ extension MainViewController {
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
+        if !decelerate
+        {
             scrolling = false
             NotificationCenter.default.post(name: Notification.Name("scrolling-stopped"), object: nil)
         }
