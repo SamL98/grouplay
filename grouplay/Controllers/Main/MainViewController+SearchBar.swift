@@ -119,7 +119,6 @@ extension MainViewController {
     }
     
     @objc func searchTextUpdated(searchText: String) {
-        print("Searching for: \(searchText).")
         searchInputText = searchText
         search(searchText: self.searchInputText)
     }

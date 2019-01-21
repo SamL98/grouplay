@@ -11,5 +11,6 @@ target 'grouplay' do
   pod 'Firebase/Database'
   pod 'KeychainSwift'
   pod 'QRCode'
+  pod 'Google-Mobile-Ads-SDK'
   
 end

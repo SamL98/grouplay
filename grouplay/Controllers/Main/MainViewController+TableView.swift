@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GoogleMobileAds
 
 extension MainViewController {
     
@@ -15,16 +16,16 @@ extension MainViewController {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tracks.count
+        return tracks.count + Int(floor(Double(tracks.count)/Double(adRowInterval)))
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func trackCell(_ tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "trackCell")!
-
+        
         guard let trackCell = cell as? TrackTableViewCell else {
             return cell
         }
@@ -44,6 +45,31 @@ extension MainViewController {
         }
         
         return trackCell
+    }
+    
+    func adCell(_ tableView: UITableView, at indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "adCell")!
+        
+        let bannerView = GADBannerView(frame: CGRect(x: 0.0, y: 0.0, width: tableView.bounds.width, height: tableView.estimatedRowHeight))
+        bannerView.rootViewController = self
+        bannerView.adUnitID = "ca-app-pub-1966629303185292/7198636850"
+        bannerView.load(GADRequest())
+        
+        cell.contentView.addSubview(bannerView)
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if
+            indexPath.row > 0 &&
+            indexPath.row % adRowInterval == 0
+        {
+            return adCell(tableView, at: indexPath)
+        }
+        else
+        {
+            return trackCell(tableView, at: indexPath)
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

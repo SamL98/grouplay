@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import OAuthSwift
 import Firebase
-import KeychainSwift
+import GoogleMobileAds
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -32,6 +32,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         FirebaseApp.configure()
         SpotifyManager.shared.player = SPTAudioStreamingController.sharedInstance()
+        
+        //let adMobID = "ca-app-pub-1966629303185292~1956373870"
+        let adMobID = "ca-app-pub-3940256099942544/2934735716"
+        GADMobileAds.configure(withApplicationID: adMobID)
         
         return true
     }

@@ -42,6 +42,10 @@ class MainViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var offsetCount = 0 // offset count for fetching the user's library
     
+    // MARK: - Ad Properties
+    
+    let adRowInterval = 12
+    
     // MARK: - Track Arrays
     
     var tracks = [SpotifyTrack]() // the tracks to be displayed in the tableview
