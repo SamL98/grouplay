@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import QRCode
 
 class InfoViewController: UIViewController, UITableViewDataSource, UITextFieldDelegate {
     
+    @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textField: UITextField!
     
@@ -34,6 +36,10 @@ class InfoViewController: UIViewController, UITableViewDataSource, UITextFieldDe
         
         textField.isEnabled = canEdit
         textField.text = sess.name
+        
+        var qrCode = QRCode(sess.name.data(using: .utf8)!)
+        qrCode.size = imageView.frame.size
+        imageView.image = qrCode.image
         
         observeMemberChange()
     }

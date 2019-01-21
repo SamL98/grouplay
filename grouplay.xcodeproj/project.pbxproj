@@ -31,7 +31,6 @@
 		B76C9CDA21EBC7460093711C /* MemberSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76C9CD921EBC7460093711C /* MemberSet.swift */; };
 		B76C9CDD21EBCF800093711C /* UserStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76C9CDC21EBCF800093711C /* UserStore.swift */; };
 		B78A8DE52017E314006F936E /* QueueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78A8DE42017E314006F936E /* QueueViewController.swift */; };
-		B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */; };
 		B79BD4CB2100F6E500BFF90C /* ScanQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */; };
 		B79FA7C31FDAF0E600A00497 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C21FDAF0E600A00497 /* MainViewController.swift */; };
 		B79FA7C51FDAF15900A00497 /* TrackTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */; };
@@ -83,7 +82,6 @@
 		B76C9CD921EBC7460093711C /* MemberSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberSet.swift; sourceTree = "<group>"; };
 		B76C9CDC21EBCF800093711C /* UserStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStore.swift; sourceTree = "<group>"; };
 		B78A8DE42017E314006F936E /* QueueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueViewController.swift; sourceTree = "<group>"; };
-		B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowQRViewController.swift; sourceTree = "<group>"; };
 		B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanQRViewController.swift; sourceTree = "<group>"; };
 		B79FA7C21FDAF0E600A00497 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		B79FA7C41FDAF15900A00497 /* TrackTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackTableViewCell.swift; sourceTree = "<group>"; };
@@ -189,7 +187,6 @@
 				B70ADE00209F69BD00330A9C /* BridgeViewController.h */,
 				B70ADE01209F69BD00330A9C /* BridgeViewController.m */,
 				B70ADDFF209F69BD00330A9C /* grouplay-Bridging-Header.h */,
-				B79BD4C82100F47D00BFF90C /* ShowQRViewController.swift */,
 				B79BD4CA2100F6E500BFF90C /* ScanQRViewController.swift */,
 				B7A3F0C621E6C9C800AA3BA4 /* InfoViewController.swift */,
 			);
@@ -401,7 +398,6 @@
 				B747DDED21344C2E001996D2 /* FirebaseManager+Current.swift in Sources */,
 				B7B7E10621F52D8F004926CD /* AlbumArtCache.swift in Sources */,
 				B7BB990A1FD9B1C4007BDB0B /* SpotifyManager.swift in Sources */,
-				B79BD4C92100F47D00BFF90C /* ShowQRViewController.swift in Sources */,
 				B769DB6B1FDC68F200DDD4BE /* FirebaseManager.swift in Sources */,
 				B769DB6D1FDC694700DDD4BE /* Utility.swift in Sources */,
 				B70ADE0920A4A16900330A9C /* MainViewController+Playback.swift in Sources */,
